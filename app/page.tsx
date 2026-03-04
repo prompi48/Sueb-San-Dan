@@ -20,7 +20,7 @@ export default async function HomePage() {
         {posts.map((post) => (
           <div key={post.id} className="border p-4 rounded bg-slate-50">
             <h3 className="font-bold">{post.title}</h3>
-            <p className="text-sm text-gray-600">วิชา: {post.subject_id}</p>
+            <p className="text-sm text-gray-600">รหัสวิชา: {post.subject_id}</p>
           </div>
         ))}
       </div>
