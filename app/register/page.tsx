@@ -67,8 +67,8 @@ export default function RegisterPage() {
       if (profileError) {
         alert("Error saving profile: " + profileError.message)
       } else {
-        alert("กรุณาเช็กอีเมลของคุณและกด Link ยืนยันก่อนเข้าสู่ระบบ")
-        router.push('/') 
+        alert("Registration Successful! Welcome to Inheritance.")
+        router.push('/main')
       }
     }
     setIsLoading(false)
@@ -96,8 +96,8 @@ export default function RegisterPage() {
             type="text" 
             placeholder="USERNAME" 
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full h-[65px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center uppercase"
+            onChange={(e) => setUsername(e.target.value.toLowerCase())}//allow only lowercase in username for search and consistency
+            className="w-full h-[65px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center"
           />
           <input 
             required
@@ -105,7 +105,7 @@ export default function RegisterPage() {
             placeholder="PASSWORD" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full h-[65px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center uppercase"
+            className="w-full h-[65px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center"
           />
           <input 
             required
@@ -113,7 +113,7 @@ export default function RegisterPage() {
             placeholder="CONFIRM PASSWORD" 
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full h-[65px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center uppercase"
+            className="w-full h-[65px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center"
           />
 
           <div className="flex justify-center mt-4">
