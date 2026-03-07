@@ -1,47 +1,74 @@
-import Link from 'next/link';
+'use client'
+import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function LoginPage() {
+  // 1. ประกาศ State และ Router ไว้ข้างใน Component
+  const [identifier, setIdentifier] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
+
+  // Supabase Auth ต้องการ Email ตัวจริงที่ใช้สมัคร
+  const { error } = await supabase.auth.signInWithPassword({
+    email: identifier,
+    password: password,
+  });
+
+  if (error) {
+    alert("Invalid Email or Password");
+    setIsLoading(false);
+  } else {
+    router.push('/main');
+  }
+};
+
   return (
-    // แก้ไข: ใช้ bg-heritage-bg และ flex เพื่อจัดกลางหน้าจอ
     <main className="min-h-screen w-full bg-heritage-bg flex items-center justify-center p-4 md:p-[100px]">
-      
-      {/* กรอบสี่เหลี่ยมขอบมน: ใช้ border-heritage-frame หนา 10px */}
       <div className="w-full h-full max-w-[1720px] max-h-[880px] bg-heritage-bg border-[10px] border-heritage-frame rounded-[50px] shadow-lg flex flex-col items-center justify-center p-10">
         
-        {/* LOGO: font-jersey และ text-heritage-logo พร้อม shadow-logo ที่ตั้งไว้ใน globals.css */}
         <h1 className="font-jersey text-[80px] md:text-[96px] text-heritage-logo drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] mb-16 tracking-wider text-center">
-        INHERITANCE
+          INHERITANCE
         </h1>
 
-        {/* ฟอร์ม Login */}
-        <form className="w-full max-w-[500px] flex flex-col gap-8">
+        {/* 4. ใส่ onSubmit ที่ฟอร์มเพื่อให้กด Enter ได้ */}
+        <form onSubmit={handleLogin} className="w-full max-w-[500px] flex flex-col gap-8">
           
-          {/* ช่อง Username: ใช้ bg-heritage-input และเงา shadow-inner ตามรูป Figma */}
           <input 
+            required
             type="text" 
-            placeholder="USERNAME" 
+            placeholder="E-MAIL" 
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
             className="w-full h-[70px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center uppercase"
           />
 
-          {/* ช่อง Password */}
           <input 
+            required
             type="password" 
             placeholder="PASSWORD" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full h-[70px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center uppercase"
           />
 
-          {/* ปุ่ม Login: ใช้ bg-heritage-btn และตัวหนังสือสีขาวอมฟ้าอ่อน */}
           <div className="flex justify-center mt-2">
             <button 
+              disabled={isLoading}
               type="submit" 
-              className="w-[200px] h-[65px] bg-heritage-btn rounded-full text-2xl font-bold text-[#E1F5FE] hover:brightness-90 transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none"
+              className="w-[200px] h-[65px] bg-heritage-btn rounded-full text-2xl font-bold text-[#E1F5FE] hover:brightness-90 transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none disabled:opacity-50"
             >
-              LOG IN
+              {isLoading ? '...' : 'LOG IN'}
             </button>
           </div>
         </form>
 
-        {/* ส่วน Register: ใช้ bg-heritage-register */}
         <div className="flex flex-col md:flex-row items-center gap-4 mt-16 text-lg text-[#171717] font-medium">
           <p>Don&apos;t have an account yet?</p>
           <Link href="/register">
@@ -50,8 +77,7 @@ export default function LoginPage() {
             </button>
           </Link>
         </div>
-
       </div>
     </main>
-  );
+  )
 }
