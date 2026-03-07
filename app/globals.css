@@ -1,21 +1,71 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Jersey+10&family=VT323&display=swap');
 
 @theme {
-  --color-heritage-bg: #F2EDE2;
-  --color-heritage-frame: #679F9F;
-  --color-heritage-logo: #135A42;
-  --color-heritage-btn: #679F9F;
-  --color-heritage-input: #CDE4F3;
-  --color-heritage-register: #A3E4D7;
+  /* กำหนดตัวแปรให้ Tailwind v4 รู้จัก */
+  --color-heritage-bg: #F0EEDF;
+  --color-heritage-frame: #6CAFA5;
+  --color-heritage-logo: #1B4332;
+  --color-heritage-btn: #1B4332;
+  --color-heritage-input: #BFD6E8;
+  --color-heritage-register: #F9E79F;
 
-  --font-jersey: var(--font-jersey);
+  --font-jersey: "Jersey 10", sans-serif;
+  --font-vt323: "VT323", monospace;
+  --font-prompt: "Prompt", sans-serif;
 
-  /* แก้ไข: ใช้ค่าเงาที่นุ่มนวลขึ้นสำหรับ Text Logo */
   --shadow-logo-text: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 @layer base {
   body {
-    @apply bg-heritage-bg text-[#171717] antialiased;
+    /* ใช้สีจาก @theme */
+    background-color: var(--color-heritage-bg);
+    color: #171717;
+    font-family: var(--font-prompt);
+    @apply antialiased;
   }
+}
+
+/* Custom Utilities สำหรับส่วนประกอบเฉพาะ */
+.main-frame {
+  border: 6px solid var(--color-heritage-frame);
+  border-radius: 40px;
+  padding: 3rem;
+  min-height: 75vh;
+  position: relative;
+}
+
+.post-card {
+  background-color: #D9D9D9;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  position: relative;
+}
+
+.post-card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 8px 8px 0px rgba(108, 175, 165, 0.4);
+}
+
+/* --- Snackbar สำหรับ Delayed Request --- */
+.undo-snackbar {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px; /* มนแบบแคปซูลตามรูป d44baf */
+  color: white;
+  z-index: 100;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
