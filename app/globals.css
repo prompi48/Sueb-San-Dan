@@ -69,3 +69,17 @@
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
+
+.search-modal {
+  background-color: #135A42; /* สีส้มตามรูป image_c789a7.png */
+  border: 4px solid white;
+  border-radius: 40px;
+  padding: 3rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-input {
+  @apply w-full p-4 bg-transparent border-b-2 border-white/30 text-white 
+         placeholder:text-white/50 focus:outline-none focus:border-white transition-all;
+}
