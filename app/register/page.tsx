@@ -4,8 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-
-// Eye Icon
+// ไอคอน Eye / Eye-Off
 const EyeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -13,7 +12,6 @@ const EyeIcon = () => (
   </svg>
 )
 
-// EyeaOff Icon
 const EyeOffIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-7 0-1.07.37-2.07 1-2.9M6.1 6.1A8.965 8.965 0 0112 5c5 0 9 4 9 7a8.96 8.96 0 01-2.1 3.9M3 3l18 18" />
@@ -77,7 +75,7 @@ export default function RegisterPage() {
         .insert([
           { 
             id: authData.user.id, 
-            username: username,
+            user_name: username,
             role: 'student' 
           }
         ])
@@ -121,16 +119,16 @@ export default function RegisterPage() {
           {/* PASSWORD พร้อมปุ่ม show/hide */}
           <div className="relative w-full">
 
-          <input 
-            required
-            type="password" 
-            placeholder={showPassword ? 'text' : 'password'} 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full h-[65px] bg-heritage-input rounded-full px-8 pr-14 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center [&::-ms-reveal]:hidden [&::-webkit-credentials-auto-fill-button]:hidden"
-          />
-
-          <button
+            <input 
+              required
+              type={showPassword ? 'text' : 'password'} 
+              placeholder="PASSWORD" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full h-[65px] bg-heritage-input rounded-full px-8 pr-14 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center [&::-ms-reveal]:hidden [&::-webkit-credentials-auto-fill-button]:hidden"
+            />
+            
+            <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-heritage-logo transition-colors"
@@ -143,16 +141,15 @@ export default function RegisterPage() {
 
           {/* CONFIRM PASSWORD พร้อมปุ่ม show/hide */}
           <div className="relative w-full">
-
-          <input 
-            required
-            type={showConfirmPassword ? 'text' : 'password'} 
-            placeholder="CONFIRM PASSWORD" 
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full h-[65px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center [&::-ms-reveal]:hidden [&::-webkit-credentials-auto-fill-button]:hidden"
-          />
-          <button
+            <input 
+              required
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="CONFIRM PASSWORD" 
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full h-[65px] bg-heritage-input rounded-full px-8 pr-14 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center [&::-ms-reveal]:hidden [&::-webkit-credentials-auto-fill-button]:hidden"
+            />
+            <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-heritage-logo transition-colors"
