@@ -165,7 +165,7 @@ export default function MainPage() {
             </button>
           )}
           <button onClick={() => setIsSearchOpen(true)} className="btn-search">🔍 SEARCH</button>
-          <button onClick={() => router.push('/edit')} className="btn-post">POST</button>
+          <button onClick={() => router.push('/create')} className="btn-post">POST</button>
           
           <div className="relative">
             <span 
