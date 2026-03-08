@@ -59,7 +59,7 @@ export default function RegisterPage() {
         .insert([
           { 
             id: authData.user.id, 
-            user_name: username,
+            username: username,
             role: 'student' 
           }
         ])
