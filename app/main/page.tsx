@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/components/Toast';
+import { Icon } from '@iconify/react';
+import { Search } from 'lucide-react';
 
 export default function MainPage() {
   const [allPosts, setAllPosts] = useState<any[]>([]);
@@ -16,7 +18,7 @@ export default function MainPage() {
   const router = useRouter();
   const [viewMode, setViewMode] = useState<'all' | 'admin' | 'mine'>('all');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  
+
   // State สำหรับ Toast Notification
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
@@ -38,20 +40,20 @@ export default function MainPage() {
         return;
       }
       setUser(session.user);
-      
+
       const { data: profile } = await supabase
         .from('profiles')
         .select('username, is_admin')
         .eq('id', session.user.id)
         .single();
-      
+
       if (profile?.is_admin) setIsAdmin(true);
 
       const { data: posts } = await supabase
         .from('posts')
         .select('*, profiles(username)')
         .order('created_at', { ascending: false });
-      
+
       setAllPosts(posts || []);
     };
     checkUser();
@@ -97,9 +99,9 @@ export default function MainPage() {
         // ลบข้อมูลที่เกี่ยวข้องกับ User ID นี้ทั้งหมด
         await supabase.from('posts').delete().eq('author_id', user.id);
         await supabase.from('profiles').delete().eq('id', user.id);
-        
+
         setToast({ msg: "ลบบัญชีเรียบร้อยแล้ว", type: 'success' });
-        
+
         setTimeout(async () => {
           await supabase.auth.signOut();
           router.push('/login');
@@ -122,7 +124,7 @@ export default function MainPage() {
 
     if (viewMode === 'admin') return post.status === 'pending';
     if (viewMode === 'mine') return post.author_id === user?.id && post.status !== 'accepted';
-    
+
     return post.status === 'accepted' || post.author_id === user?.id;
   });
 
@@ -148,49 +150,52 @@ export default function MainPage() {
     <div className="min-h-screen p-8">
       {/* Header */}
       <header className="flex justify-between items-center mb-6">
-        <h1 
-          className="text-4xl font-bold text-heritage-logo font-jersey cursor-pointer" 
+        <h1
+          className="text-4xl font-bold text-heritage-logo font-jersey cursor-pointer"
           onClick={() => { setViewMode('all'); setShowPending(false); router.push('/main'); }}
         >
           INHERITANCE {viewMode !== 'all' && <span className="text-sm ml-2">({viewMode.toUpperCase()})</span>}
         </h1>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-6">
           {isAdmin && (
-            <button 
+            <button
               onClick={() => { setShowPending(!showPending); setViewMode(showPending ? 'all' : 'admin'); }}
               className={`w-12 h-6 rounded-full transition-colors relative ${showPending ? 'bg-red-500' : 'bg-gray-400'}`}
             >
               <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${showPending ? 'left-7' : 'left-1'}`} />
             </button>
           )}
-          <button onClick={() => setIsSearchOpen(true)} className="btn-search">🔍 SEARCH</button>
+          <button onClick={() => setIsSearchOpen(true)} className="btn-search">
+            <Icon icon="pixelarticons:search" width="18" height="18" color="#679F9F" />
+            SEARCH
+          </button>
           <button onClick={() => router.push('/create')} className="btn-post">POST</button>
-          
+
           <div className="relative">
-            <span 
-              className="font-semibold text-sm cursor-pointer hover:underline font-vt323" 
+            <span
+              className="font-semibold text-sm cursor-pointer hover:underline font-vt323"
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             >
               {user?.email}
             </span>
-            
+
             {isUserMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white border-4 border-heritage-frame rounded-xl shadow-xl z-[60] py-2 font-vt323 text-lg">
-                <button 
+                <button
                   onClick={() => { setViewMode('mine'); setIsUserMenuOpen(false); }}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 uppercase"
                 >
                   My Post Status
                 </button>
-                <button 
+                <button
                   onClick={handleSignOut}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600 uppercase"
                 >
                   Logout
                 </button>
                 <div className="border-t border-gray-200 mt-2">
-                  <button 
+                  <button
                     onClick={handleDeleteAccount}
                     className="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-700 uppercase"
                   >
@@ -207,17 +212,15 @@ export default function MainPage() {
       <div className="main-frame">
         <div className="posts-grid">
           {displayPosts.map((post) => (
-            <div 
-              key={post.id} 
-              className={`post-card group cursor-pointer ${
-                viewMode === 'mine' && post.status === 'rejected' ? 'bg-[#F39C12] text-white' : 'bg-[#D9D9D9]'
-              }`}
+            <div
+              key={post.id}
+              className={`post-card group cursor-pointer ${viewMode === 'mine' && post.status === 'rejected' ? 'bg-[#F39C12] text-white' : 'bg-[#D9D9D9]'
+                }`}
               onClick={() => router.push(`/post/${post.id}`)}
             >
               {viewMode === 'mine' && (
-                <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full mb-1 inline-block border border-black ${
-                  post.status === 'pending' ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white'
-                }`}>
+                <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full mb-1 inline-block border border-black ${post.status === 'pending' ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white'
+                  }`}>
                   {post.status.toUpperCase()}
                 </div>
               )}
@@ -226,7 +229,7 @@ export default function MainPage() {
                 <div className="flex flex-col items-end">
                   <span className="text-sm text-gray-600 font-vt323">{post.subject_id}</span>
                   {viewMode === 'mine' && post.status === 'rejected' && (
-                    <button 
+                    <button
                       onClick={(e) => { e.stopPropagation(); router.push(`/edit/${post.id}`); }}
                       className="mt-2 text-xs bg-white text-black px-3 py-1 rounded-full border border-black hover:bg-gray-200 font-prompt"
                     >
@@ -257,9 +260,9 @@ export default function MainPage() {
         {/* Pagination */}
         <div className="pagination-wrapper mt-8 flex justify-center items-center gap-4">
           <button className="pagination-btn" onClick={() => setCurrentPage(1)}>{"<<"}</button>
-          <button className="pagination-btn" onClick={() => setCurrentPage(p => Math.max(1, p-1))}>{"<"}</button>
+          <button className="pagination-btn" onClick={() => setCurrentPage(p => Math.max(1, p - 1))}>{"<"}</button>
           <span className="font-jersey text-2xl">{currentPage} / {totalPages || 1}</span>
-          <button className="pagination-btn" onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))}>{">"}</button>
+          <button className="pagination-btn" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}>{">"}</button>
           <button className="pagination-btn" onClick={() => setCurrentPage(totalPages)}>{">>"}</button>
         </div>
       </div>
@@ -271,12 +274,12 @@ export default function MainPage() {
             <button onClick={() => setIsSearchOpen(false)} className="absolute top-4 right-6 text-white text-2xl font-bold">X</button>
             <h2 className="text-white font-prompt text-center mb-6 text-lg">ค้นหาแนวข้อสอบ / สรุปวิชา</h2>
             <div className="space-y-4 font-prompt">
-              <input type="text" placeholder="ชื่อโพสต์" className="search-input w-full p-3 rounded-xl" value={tempSearch.title} onChange={(e) => setTempSearch({...tempSearch, title: e.target.value})} />
+              <input type="text" placeholder="ชื่อโพสต์" className="search-input w-full p-3 rounded-xl" value={tempSearch.title} onChange={(e) => setTempSearch({ ...tempSearch, title: e.target.value })} />
               <div className="grid grid-cols-2 gap-4">
-                <input type="text" placeholder="รหัสวิชา" className="search-input p-3 rounded-xl" value={tempSearch.subject_id} onChange={(e) => setTempSearch({...tempSearch, subject_id: e.target.value})} />
-                <input type="text" placeholder="ชื่อวิชา" className="search-input p-3 rounded-xl" value={tempSearch.subject_name} onChange={(e) => setTempSearch({...tempSearch, subject_name: e.target.value})} />
+                <input type="text" placeholder="รหัสวิชา" className="search-input p-3 rounded-xl" value={tempSearch.subject_id} onChange={(e) => setTempSearch({ ...tempSearch, subject_id: e.target.value })} />
+                <input type="text" placeholder="ชื่อวิชา" className="search-input p-3 rounded-xl" value={tempSearch.subject_name} onChange={(e) => setTempSearch({ ...tempSearch, subject_name: e.target.value })} />
               </div>
-              <input type="text" placeholder="ชื่อผู้เขียน" className="search-input w-full p-3 rounded-xl" value={tempSearch.author} onChange={(e) => setTempSearch({...tempSearch, author: e.target.value})} />
+              <input type="text" placeholder="ชื่อผู้เขียน" className="search-input w-full p-3 rounded-xl" value={tempSearch.author} onChange={(e) => setTempSearch({ ...tempSearch, author: e.target.value })} />
             </div>
             <div className="flex gap-3 mt-8">
               <button onClick={clearSearch} className="flex-1 py-3 bg-gray-500 text-white rounded-full font-bold">CLEAR</button>
@@ -288,9 +291,8 @@ export default function MainPage() {
 
       {/* Undo Snackbar */}
       {undoData && (
-        <div className={`undo-snackbar fixed bottom-10 right-10 flex items-center gap-4 p-4 rounded-xl text-white shadow-2xl z-50 ${
-          undoData.type === 'delete' ? 'bg-[#E63946]' : 'bg-[#276F50]'
-        }`}>
+        <div className={`undo-snackbar fixed bottom-10 right-10 flex items-center gap-4 p-4 rounded-xl text-white shadow-2xl z-50 ${undoData.type === 'delete' ? 'bg-[#E63946]' : 'bg-[#276F50]'
+          }`}>
           <span className="font-prompt">ทำรายการสำเร็จ (5 วินาทีเพื่อกู้คืน)</span>
           <button onClick={undoAction} className="border-2 border-white px-4 py-1 rounded-full text-sm font-bold hover:bg-white/20">UNDO</button>
         </div>
@@ -298,10 +300,10 @@ export default function MainPage() {
 
       {/* Success Toast */}
       {toast && (
-        <Toast 
-          message={toast.msg} 
-          type={toast.type} 
-          onClose={() => setToast(null)} 
+        <Toast
+          message={toast.msg}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </div>
