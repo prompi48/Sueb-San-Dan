@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -11,11 +11,20 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push('/main');
+      }
+    };
+    checkSession();
+  }, [router]);
+
 const handleLogin = async (e: React.FormEvent) => {
   e.preventDefault();
   setIsLoading(true);
 
-  // Supabase Auth ต้องการ Email ตัวจริงที่ใช้สมัคร
   const { error } = await supabase.auth.signInWithPassword({
     email: identifier,
     password: password,
@@ -46,7 +55,7 @@ const handleLogin = async (e: React.FormEvent) => {
             placeholder="E-MAIL" 
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
-            className="w-full h-[70px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center uppercase"
+            className="w-full h-[70px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center"
           />
 
           <input 
@@ -55,7 +64,7 @@ const handleLogin = async (e: React.FormEvent) => {
             placeholder="PASSWORD" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full h-[70px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center uppercase"
+            className="w-full h-[70px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center"
           />
 
           <div className="flex justify-center mt-2">
