@@ -170,7 +170,7 @@ export default function MainPage() {
             <Icon icon="pixelarticons:search" width="18" height="18" color="#679F9F" />
             SEARCH
           </button>
-          <button onClick={() => router.push('/create')} className="btn-post">POST</button>
+          <button onClick={() => router.push('/create')} className="btn-post"> POST </button>
 
           <div className="relative">
             <span

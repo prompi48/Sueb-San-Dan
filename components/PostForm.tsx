@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Upload } from 'lucide-react';
 
 interface PostFormProps {
   initialData?: {
@@ -76,11 +77,13 @@ export function PostForm({ initialData, onSubmit, submitText, userEmail }: PostF
               value={formData.media_link}
               onChange={(e) => setFormData({...formData, media_link: e.target.value})}
             />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl">📤</span>
+           <Upload className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 w-6 h-6" />
           </div>
           
-          <button type="submit" className="btn-post py-4 px-12 text-3xl">
-            {submitText}
+        <button type="submit" className="bg-[#F7ED92] py-4 px-12 text-3xl font-jersey rounded-full 
+             transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+             hover:-translate-y-1 hover:shadow-[0_8px_0_rgba(0,0,0,0.25)]">
+          {submitText}
           </button>
         </div>
       </form>

@@ -9,6 +9,7 @@
   --color-heritage-btn: #1B4332;
   --color-heritage-input: #BFD6E8;
   --color-heritage-register: #F9E79F;
+  --color-heritage-post: #F7ED92;
 
   --font-jersey: "Jersey 10", sans-serif;
   --font-vt323: "VT323", monospace;
@@ -119,4 +120,32 @@
   left: 14px;      /* ปรับระยะตรงนี้ */
   top: 50%;
   transform: translateY(-50%);
+}
+.btn-post {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 150px;
+  height: 45px;
+  padding: 0;
+
+  background: #F7ED92;
+  color: #679F9F;
+
+  border-radius: 999px;
+
+  font-family: var(--font-jersey);
+  font-size: 26px;   /* ลดจาก 40 */
+  letter-spacing: 2px;
+
+  padding: 0;
+   box-shadow: inset -5px -7px 4.5px rgba(0,0,0,0.25),
+  inset 3px 3px 6px rgba(255,255,255,0.35);
+  transition: all 0.15s ease;
+
+}
+.btn-post:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 0 rgba(0,0,0,0.25);
 }
