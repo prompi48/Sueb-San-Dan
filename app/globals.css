@@ -41,9 +41,17 @@
   background-color: #D9D9D9;
   border-radius: 12px;
   padding: 1.5rem;
+  margin-bottom: 1rem;
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
   position: relative;
+}
+
+/*จัด layout ของโพสต์ให้แสดงเป็นตาราง 2 คอลัมน์*/
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 คอลัมน์ */
+  gap: 30px;
 }
 
 .post-card:hover {
@@ -81,7 +89,7 @@
 }
 
 .search-input {
-  @apply w-full p-4 bg-transparent border-b-2 border-white/30 text-white 
+  @apply w-full p-4 bg-transparent border-b-2 border-white/30 text-white
          placeholder:text-white/50 focus:outline-none focus:border-white transition-all;
 }
 
@@ -121,6 +129,7 @@
   top: 50%;
   transform: translateY(-50%);
 }
+
 .btn-post {
   display: flex;
   align-items: center;

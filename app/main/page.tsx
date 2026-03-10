@@ -143,8 +143,18 @@ export default function MainPage() {
     setIsSearchOpen(false);
   };
 
-  const displayPosts = filteredPosts.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage);
-  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  /*กำหนดจำนวนโพสต์ต่อหน้า*/
+  const POSTS_PER_PAGE = 4;
+
+  /*คำนวณตำแหน่งโพสต์*/
+  const indexOfLastPost = currentPage * POSTS_PER_PAGE;
+  const indexOfFirstPost = indexOfLastPost - POSTS_PER_PAGE;
+
+  /*เลือกเฉพาะโพสต์ที่จะแสดง*/
+  const displayPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
+
+  /*คำนวณจำนวนหน้าทั้งหมด*/
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
 
   return (
     <div className="min-h-screen p-8">
