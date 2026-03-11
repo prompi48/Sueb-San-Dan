@@ -11,9 +11,7 @@ export default function MainPage() {
   const [allPosts, setAllPosts] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [user, setUser] = useState<any>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [showPending, setShowPending] = useState(false);
   const [undoData, setUndoData] = useState<{ id: number; type: string; timeoutId: NodeJS.Timeout } | null>(null);
   const router = useRouter();
   const [viewMode, setViewMode] = useState<'all' | 'admin' | 'mine'>('all');
@@ -168,14 +166,16 @@ export default function MainPage() {
         </h1>
 
         <div className="flex items-center gap-6">
+
           {isAdmin && (
             <button
-              onClick={() => { setShowPending(!showPending); setViewMode(showPending ? 'all' : 'admin'); }}
-              className={`w-12 h-6 rounded-full transition-colors relative ${showPending ? 'bg-red-500' : 'bg-gray-400'}`}
+            onClick={()=>router.push('/admin')}
+            className="btn-post"
             >
-              <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${showPending ? 'left-7' : 'left-1'}`} />
+            ADMIN
             </button>
-          )}
+            )}
+          
           <button onClick={() => setIsSearchOpen(true)} className="btn-search">
             <Icon icon="pixelarticons:search" width="18" height="18" color="#679F9F" />
             SEARCH
@@ -246,13 +246,7 @@ export default function MainPage() {
                       EDIT & RESUBMIT
                     </button>
                   )}
-                  {isAdmin && showPending && (
-                    <div className="flex gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
-                      <button onClick={() => triggerAction(post.id, 'delete')} title="Delete">🗑️</button>
-                      <button onClick={() => triggerAction(post.id, 'reject')} title="Reject">❌</button>
-                      <button onClick={() => triggerAction(post.id, 'accept')} title="Accept">✔️</button>
-                    </div>
-                  )}
+                  
                 </div>
               </div>
               <p className="text-sm mb-6 line-clamp-3 font-prompt opacity-90">{post.description}</p>

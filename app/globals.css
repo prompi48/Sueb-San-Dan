@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Jersey+10&family=VT323&display=swap');
+@import "tailwindcss";
 
 @theme {
   /* กำหนดตัวแปรให้ Tailwind v4 รู้จัก */
