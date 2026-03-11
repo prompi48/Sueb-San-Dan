@@ -12,6 +12,7 @@ export default function MainPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showPending, setShowPending] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [undoData, setUndoData] = useState<{ id: number; type: string; timeoutId: NodeJS.Timeout } | null>(null);
   const router = useRouter();
