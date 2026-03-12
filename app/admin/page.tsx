@@ -22,11 +22,11 @@ export default function AdminPage() {
 
       const { data:profile } = await supabase
       .from('profiles')
-      .select('is_admin')
+      .select('role')
       .eq('id',session.user.id)
       .single()
 
-      if(!profile?.is_admin){
+      if(profile?.role !== 'admin'){
         router.push('/main')
         return
       }
