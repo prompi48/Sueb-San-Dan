@@ -19,7 +19,7 @@ export default function LoginPage() {
         // เช็ค Role จาก JWT แปะไปด้วยเลย เผื่อใช้แยกหน้า
         const role = session.user.app_metadata?.role;
         if (role === 'admin') {
-          router.push('/admin/dashboard'); // หรือหน้า admin ที่คุณตั้งไว้
+          router.push('/admin');
         } else {
           router.push('/main');
         }

@@ -76,17 +76,11 @@ const handleRegister = async (e: React.FormEvent) => {
       if (authData.user) {
         const { error: profileError } = await supabase
           .from('profiles')
-          .insert([
-            { 
-              id: authData.user.id, 
-              username: username,
-              role: 'student' 
-            }
-          ])
+          .update({ username: username }) // ✅ update instead of insert
+          .eq('id', authData.user.id)
 
         if (profileError) {
           setIsLoading(false)
-          // กรณีหลุดรอดมาถึงตรงนี้ (Race Condition, username เดียวกันสมัครพร้อมกัน)
           return alert(`Account created but profile failed: ${profileError.message}`);
         }
 

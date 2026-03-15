@@ -14,22 +14,22 @@ export default function PostDetailPage() {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
-
+  
   useEffect(() => {
     const fetchPostAndUser = async () => {
-      // 1. ดึง Session และเช็คสิทธิ์ Admin
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUser(session.user);
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role') // ใช้ role แทน is_admin เพื่อให้ตรงกับหน้าอื่น
-          .eq('id', session.user.id)
-          .single();
-        setIsAdmin(profile?.role === 'admin');
-      }
+      if (!session) { router.push('/'); return; }
+      setUser(session.user);
 
-      // 2. ดึงรายละเอียดโพสต์
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      
+      const adminStatus = profile?.role === 'admin';
+      setIsAdmin(adminStatus);
+
       const { data, error } = await supabase
         .from('posts')
         .select('*, profiles(username)')
@@ -38,6 +38,12 @@ export default function PostDetailPage() {
 
       if (error || !data) {
         setToast({ msg: "ไม่พบข้อมูลโพสต์ที่คุณต้องการ", type: 'error' });
+        setTimeout(() => router.push('/main'), 1500);
+        return;
+      }
+
+      if (data?.is_pending && !adminStatus && session.user.id !== data.author_id) {
+        setToast({ msg: "This post is pending review.", type: 'error' });
         setTimeout(() => router.push('/main'), 1500);
         return;
       }

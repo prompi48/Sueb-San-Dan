@@ -24,10 +24,13 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
     media_link: initialData?.media_link || '' 
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+  onSubmit({
+    ...formData,
+    media_link: formData.media_link.trim() || null 
+  });
+};
 
   return (
     <div className="main-frame max-w-4xl w-full bg-[#D9D9D9] p-10 border-4 border-heritage-frame shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
@@ -37,6 +40,7 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
           <label className="text-[10px] font-bold ml-4 uppercase opacity-50">Post Title</label>
           <input 
             type="text" 
+            maxLength={100}
             placeholder="เช่น สรุป Logic Design กลางภาค" 
             className="w-full p-4 bg-white border-2 border-black rounded-sm focus:ring-4 ring-heritage-logo/20 outline-none"
             value={formData.title}
@@ -50,6 +54,7 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
             <label className="text-[10px] font-bold ml-4 uppercase opacity-50">Subject Name</label>
             <input 
               type="text" 
+              maxLength={100}
               placeholder="ชื่อวิชา" 
               className="w-full p-4 bg-white border-2 border-black rounded-sm outline-none focus:ring-4 ring-heritage-logo/20"
               value={formData.subject_name}
@@ -60,6 +65,7 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
             <label className="text-[10px] font-bold ml-4 uppercase opacity-50">Subject ID</label>
             <input 
               type="text" 
+              maxLength={20}
               placeholder="รหัสวิชา (เช่น 010113xxx)" 
               className="w-full p-4 bg-white border-2 border-black rounded-sm outline-none focus:ring-4 ring-heritage-logo/20"
               value={formData.subject_id}
@@ -72,7 +78,8 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
         <div className="space-y-1">
           <label className="text-[10px] font-bold ml-4 uppercase opacity-50">Description</label>
           <textarea 
-            placeholder="รายละเอียดเพิ่มเติม หรือคีย์เวิร์ดสำหรับการค้นหา..." 
+            maxLength={2000}
+            placeholder="รายละเอียดเพิ่มเติม..." 
             rows={6}
             className="w-full p-4 bg-white border-2 border-black rounded-sm outline-none focus:ring-4 ring-heritage-logo/20 resize-none"
             value={formData.description}
@@ -91,7 +98,6 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
                 className="w-full p-4 bg-[#BFD6E8] border-2 border-black rounded-sm pr-12 outline-none"
                 value={formData.media_link}
                 onChange={(e) => setFormData({...formData, media_link: e.target.value})}
-                required
               />
               <Icon icon="pixelarticons:link" className="absolute right-4 top-1/2 -translate-y-1/2 text-black w-6 h-6" />
             </div>

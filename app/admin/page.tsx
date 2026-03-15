@@ -18,6 +18,7 @@ export default function AdminPage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
   const [isChecking, setIsChecking] = useState(true); // เพิ่มสถานะเช็ค Admin
+  const [expandedId, setExpandedId] = useState<number | null>(null);
   
   const pendingRef = useRef<PendingAction | null>(null);
 
@@ -66,7 +67,7 @@ export default function AdminPage() {
       executeDatabaseAction(id, type);
       setPendingAction(null);
       pendingRef.current = null;
-    }, 5000);
+    }, 3000);
 
     const newAction = { id, type, timeoutId, postData: postToProcess };
     setPendingAction(newAction);
@@ -116,7 +117,15 @@ export default function AdminPage() {
           <p className="text-xs font-bold opacity-50 uppercase tracking-tighter">Review pending archives for approval</p>
         </div>
         <button 
-          onClick={() => router.push('/main')} 
+          onClick={async () => {
+            if (pendingRef.current) {
+              clearTimeout(pendingRef.current.timeoutId);
+              await executeDatabaseAction(pendingRef.current.id, pendingRef.current.type);
+              setPendingAction(null);
+              pendingRef.current = null;
+            }
+            router.push('/main');
+          }} 
           className="font-jersey text-xl bg-white border-2 border-black px-4 py-1 hover:bg-black hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
         >
           BACK TO MAIN
@@ -131,40 +140,77 @@ export default function AdminPage() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {posts.map(post => (
-          <div key={post.id} className="p-6 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-sm flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-center mb-4 border-b-2 border-dashed border-gray-200 pb-2">
-                <span className="text-[10px] font-bold bg-black text-white px-2 py-0.5">{post.subject_id}</span>
-                <span className="text-[10px] opacity-40">{new Date(post.created_at).toLocaleString()}</span>
-              </div>
-              <h2 className="text-xl font-bold mb-2 text-heritage-logo">{post.title}</h2>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-4 leading-relaxed italic">"{post.description}"</p>
-            </div>
-            
-            <div className="flex justify-between items-center mt-6 pt-4 border-t-2 border-black/5">
-              <span className="text-xs font-vt323 bg-heritage-input px-3 py-1 border border-black/10 rounded-full font-bold">
-                BY: {post.profiles?.username || 'UNKNOWN'}
-              </span>
-              <div className="flex gap-3">
-                <button 
-                  onClick={() => triggerAction(post.id, 'accept')}
-                  className="w-12 h-12 flex items-center justify-center bg-[#6CAFA5] border-2 border-black hover:brightness-110 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all"
-                  title="Approve Post"
-                >
-                  <Icon icon="pixelarticons:check" width="28" className="text-white" />
-                </button>
-                <button 
-                  onClick={() => triggerAction(post.id, 'delete')}
-                  className="w-12 h-12 flex items-center justify-center bg-[#d44c24] border-2 border-black hover:brightness-110 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all"
-                  title="Reject and Delete"
-                >
-                  <Icon icon="pixelarticons:close" width="28" className="text-white" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+{posts.map(post => (
+  <div 
+    key={post.id} 
+    className="p-6 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-sm flex flex-col justify-between"
+  >
+    <div>
+      <div className="flex justify-between items-center mb-4 border-b-2 border-dashed border-gray-200 pb-2">
+        <span className="text-[10px] font-bold bg-black text-white px-2 py-0.5">{post.subject_id}</span>
+        <span className="text-[10px] opacity-40">{new Date(post.created_at).toLocaleString()}</span>
+      </div>
+      <h2 className="text-xl font-bold mb-2 text-heritage-logo break-all">{post.title}</h2>
+
+      {/* Description — expands on click */}
+      <p 
+        onClick={() => setExpandedId(expandedId === post.id ? null : post.id)}
+        className={`text-sm text-gray-600 mb-2 leading-relaxed italic cursor-pointer select-none transition-all
+          ${expandedId === post.id ? '' : 'line-clamp-4'} break-all`}
+      >
+        "{post.description}"
+      </p>
+
+      {/* Expand/collapse hint */}
+      <button
+        onClick={() => setExpandedId(expandedId === post.id ? null : post.id)}
+        className="text-[10px] font-bold uppercase opacity-40 hover:opacity-100 transition-opacity mb-2"
+      >
+        {expandedId === post.id ? '▲ COLLAPSE' : '▼ READ MORE'}
+      </button>
+
+      {/* Media link — only visible when expanded */}
+      {expandedId === post.id && post.media_link && (
+        <a
+          href={post.media_link.startsWith('http') ? post.media_link : `https://${post.media_link}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-xs font-bold text-heritage-logo underline mt-2 break-all"
+        >
+          <Icon icon="pixelarticons:external-link" width="14" />
+          {post.media_link}
+        </a>
+      )}
+
+      {/* Subject name — only visible when expanded */}
+      {expandedId === post.id && post.subject_name && (
+        <p className="text-xs opacity-50 mt-1 font-bold uppercase">{post.subject_name}</p>
+      )}
+    </div>
+
+    <div className="flex justify-between items-center mt-6 pt-4 border-t-2 border-black/5">
+      <span className="text-xs font-vt323 bg-heritage-input px-3 py-1 border border-black/10 rounded-full font-bold">
+        BY: {post.profiles?.username || 'UNKNOWN'}
+      </span>
+      <div className="flex gap-3">
+        <button
+          onClick={() => triggerAction(post.id, 'accept')}
+          className="w-12 h-12 flex items-center justify-center bg-[#6CAFA5] border-2 border-black hover:brightness-110 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all"
+          title="Approve Post"
+        >
+          <Icon icon="pixelarticons:check" width="28" className="text-white" />
+        </button>
+        <button
+          onClick={() => triggerAction(post.id, 'delete')}
+          className="w-12 h-12 flex items-center justify-center bg-[#d44c24] border-2 border-black hover:brightness-110 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all"
+          title="Reject and Delete"
+        >
+          <Icon icon="pixelarticons:close" width="28" className="text-white" />
+        </button>
+      </div>
+    </div>
+  </div>
+))}
       </div>
 
       {/* Undo Snackbar: แจ้งเตือนพร้อมปุ่มยกเลิกภายใน 5 วินาที */}

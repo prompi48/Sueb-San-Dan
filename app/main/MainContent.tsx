@@ -51,7 +51,10 @@ export default function MainContent() {
       .eq('id', session.user.id)
       .single();
     
-    if (profile?.role === 'admin') setIsAdmin(true);
+    // if (profile?.role === 'admin') setIsAdmin(true);
+    // else setIsAdmin(false);
+
+    setIsAdmin(profile?.role === 'admin');
 
     const from = (currentPage - 1) * POSTS_PER_PAGE;
     const to = from + POSTS_PER_PAGE - 1;
@@ -68,13 +71,28 @@ export default function MainContent() {
     if (searchQuery.title) query = query.ilike('title', `%${searchQuery.title}%`);
     if (searchQuery.subject_id) query = query.ilike('subject_id', `%${searchQuery.subject_id}%`);
     if (searchQuery.subject_name) query = query.ilike('subject_name', `%${searchQuery.subject_name}%`);
-    
     if (searchQuery.author) {
-      query = query.filter('profiles.username', 'ilike', `%${searchQuery.author}%`);
+      const { data: matchedProfiles } = await supabase
+        .from('profiles')
+        .select('id')
+        .ilike('username', `%${searchQuery.author}%`);
+      
+      const ids = matchedProfiles?.map(p => p.id) || [];
+      if (ids.length > 0) {
+        query = query.in('author_id', ids);
+      } else {
+        // No matches — return empty
+        setPosts([]);
+        setTotalCount(0);
+        setLoading(false);
+        return;
+      }
     }
 
     const { data, count, error } = await query;
-    if (!error) {
+    if (error) {
+      setToast({ msg: "Database Error: " + error.message, type: 'error' });
+    } else {
       setPosts(data || []);
       setTotalCount(count || 0);
     }
@@ -84,7 +102,16 @@ export default function MainContent() {
   useEffect(() => {
     fetchPosts();
     setInputPage(currentPage.toString());
-  }, [fetchPosts, currentPage]);
+  }, [fetchPosts]);
+
+  useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.relative')) setIsUserMenuOpen(false);
+  };
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => document.removeEventListener('mousedown', handleClickOutside);
+}, []);
 
   // --- Helpers ---
   const updateURL = (newPage: number, newSearch = searchQuery) => {
@@ -206,8 +233,8 @@ export default function MainContent() {
                     {post.subject_id}
                   </span>
                 </div>
-                <h3 className="text-xl font-bold mb-2 line-clamp-1 text-heritage-logo uppercase">{post.title}</h3>
-                <p className="text-sm font-prompt line-clamp-3 opacity-80 mb-4 flex-grow italic leading-relaxed">
+                  <h3 className="text-xl font-bold mb-2 line-clamp-1 text-heritage-logo uppercase break-all">{post.title}</h3>
+                  <p className="text-sm font-prompt line-clamp-3 opacity-80 mb-4 flex-grow italic leading-relaxed break-all">
                   "{post.description}"
                 </p>
                 
