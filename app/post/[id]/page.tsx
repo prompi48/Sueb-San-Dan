@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter, useParams } from 'next/navigation';
 import { Toast } from '@/components/Toast';
+import { Icon } from '@iconify/react';
 
 export default function PostDetailPage() {
   const { id } = useParams();
@@ -16,16 +17,16 @@ export default function PostDetailPage() {
 
   useEffect(() => {
     const fetchPostAndUser = async () => {
-      // 1. ดึงข้อมูล Session และเช็คสิทธิ์ Admin จาก Profile
+      // 1. ดึง Session และเช็คสิทธิ์ Admin
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setUser(session.user);
         const { data: profile } = await supabase
           .from('profiles')
-          .select('is_admin')
+          .select('role') // ใช้ role แทน is_admin เพื่อให้ตรงกับหน้าอื่น
           .eq('id', session.user.id)
           .single();
-        setIsAdmin(profile?.is_admin || false);
+        setIsAdmin(profile?.role === 'admin');
       }
 
       // 2. ดึงรายละเอียดโพสต์
@@ -36,8 +37,8 @@ export default function PostDetailPage() {
         .single();
 
       if (error || !data) {
-        alert("ไม่พบโพสต์ที่คุณต้องการ");
-        router.push('/main');
+        setToast({ msg: "ไม่พบข้อมูลโพสต์ที่คุณต้องการ", type: 'error' });
+        setTimeout(() => router.push('/main'), 1500);
         return;
       }
 
@@ -50,8 +51,8 @@ export default function PostDetailPage() {
 
   const handleDelete = async () => {
     const confirmMsg = isAdmin && user?.id !== post.author_id 
-      ? "คุณกำลังใช้สิทธิ์ ADMIN เพื่อลบโพสต์นี้ ยืนยันหรือไม่?" 
-      : "ยืนยันการลบโพสต์ของคุณ?";
+      ? "SYSTEM WARNING: คุณกำลังใช้สิทธิ์ ADMIN เพื่อลบโพสต์นี้ ยืนยันหรือไม่?" 
+      : "ยืนยันการลบโพสต์ของคุณออกจากระบบ?";
 
     if (!confirm(confirmMsg)) return;
 
@@ -61,16 +62,16 @@ export default function PostDetailPage() {
       .eq('id', id);
 
     if (error) {
-      setToast({ msg: "เกิดข้อผิดพลาดในการลบ", type: 'error' });
+      setToast({ msg: "เกิดข้อผิดพลาดในการลบ: " + error.message, type: 'error' });
     } else {
-      setToast({ msg: "ลบโพสต์เรียบร้อยแล้ว", type: 'success' });
+      setToast({ msg: "ลบโพสต์ออกจากสารบบเรียบร้อยแล้ว", type: 'success' });
       setTimeout(() => router.push('/main'), 1500);
     }
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center font-jersey text-2xl text-heritage-logo">
-      LOADING POST DETAILS...
+    <div className="min-h-screen flex items-center justify-center font-jersey text-3xl text-heritage-logo bg-heritage-bg animate-pulse">
+      RETRIEVING ARCHIVE...
     </div>
   );
 
@@ -78,91 +79,97 @@ export default function PostDetailPage() {
   const canDelete = isOwner || isAdmin;
 
   return (
-    <div className="min-h-screen p-8 flex flex-col items-center bg-[#F4F1EA]">
-      {/* Header Section */}
+    <div className="min-h-screen p-8 flex flex-col items-center bg-heritage-bg font-prompt">
       <header className="w-full max-w-5xl flex justify-between items-center mb-10">
         <h1 
-          className="text-4xl font-bold text-heritage-logo font-jersey cursor-pointer" 
+          className="text-4xl font-bold text-heritage-logo font-jersey cursor-pointer select-none" 
           onClick={() => router.push('/main')}
         >
           INHERITANCE
         </h1>
-        <div className="font-vt323 text-lg bg-white/50 px-4 py-1 rounded-full border border-heritage-frame uppercase">
-          CODE: {post.subject_id}
+        <div className="font-vt323 text-xl bg-white border-2 border-black px-4 py-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] uppercase">
+          ID: {post.subject_id}
         </div>
       </header>
 
-      {/* Main Content Frame */}
-      <div className="main-frame max-w-4xl w-full p-10 bg-[#D9D9D9] relative border-[6px] border-[#6CAFA5] rounded-sm shadow-2xl min-h-[500px] flex flex-col">
+      <div className="main-frame max-w-4xl w-full p-8 md:p-12 bg-[#D9D9D9] border-4 border-heritage-frame shadow-[16px_16px_0px_0px_rgba(0,0,0,0.1)] relative min-h-[500px] flex flex-col">
         
-        {/* Title & Actions Section */}
-        <div className="flex justify-between items-start mb-6">
+        {/* Title & Control Bar */}
+        <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
           <div className="flex-1">
-            <h2 className="text-5xl font-bold font-jersey text-black mb-2 uppercase tracking-wide">
+            <h2 className="text-4xl md:text-6xl font-bold font-jersey text-heritage-logo mb-2 uppercase break-words leading-tight">
               {post.title}
             </h2>
-            <p className="text-xl font-prompt text-gray-700">{post.subject_name}</p>
+            <p className="text-xl font-prompt text-gray-600 font-bold">{post.subject_name}</p>
           </div>
 
-          <div className="flex gap-3 font-vt323 text-xl">
+          <div className="flex gap-3 font-jersey text-xl self-end md:self-start">
             {isOwner && (
               <button 
                 onClick={() => router.push(`/edit/${id}`)}
-                className="px-6 py-2 bg-gray-500 text-white font-bold rounded-md hover:bg-gray-600 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                className="px-6 py-2 bg-[#6CAFA5] text-white border-2 border-black hover:brightness-110 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-1 transition-all"
               >
-                Edit
+                EDIT
               </button>
             )}
             {canDelete && (
               <button 
                 onClick={handleDelete}
-                className="px-6 py-2 bg-[#E63946] text-white font-bold rounded-md hover:bg-red-700 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                className="px-6 py-2 bg-[#d44c24] text-white border-2 border-black hover:brightness-110 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-1 transition-all flex items-center gap-2"
               >
-                {isAdmin && !isOwner ? "Admin Delete" : "Delete"}
+                <Icon icon="pixelarticons:trash" width="20" />
+                {isAdmin && !isOwner ? "MOD DELETE" : "DELETE"}
               </button>
             )}
           </div>
         </div>
 
-        {/* Info Bar */}
-        <div className="flex gap-10 mb-8 font-vt323 text-xl text-gray-600 border-b-2 border-gray-300 pb-4">
-          <span>by {post.profiles?.username || 'Unknown'}</span>
-          <span>{new Date(post.created_at).toLocaleDateString()}</span>
+        {/* Info Header */}
+        <div className="flex flex-wrap gap-6 mb-8 font-vt323 text-2xl text-black/60 border-y-2 border-black/5 py-4">
+          <div className="flex items-center gap-2">
+            <Icon icon="pixelarticons:user" />
+            <span>{post.profiles?.username || "Deleted User"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Icon icon="pixelarticons:calendar" />
+            <span>{new Date(post.created_at).toLocaleDateString()}</span>
+          </div>
         </div>
 
-        {/* Description Body */}
-        <div className="flex-1 font-prompt text-lg leading-relaxed text-black whitespace-pre-wrap mb-10">
+        {/* Content Body */}
+        <div className="flex-1 font-prompt text-lg leading-relaxed text-black whitespace-pre-wrap mb-12 bg-white/30 p-6 border-2 border-dashed border-black/10 rounded-sm">
           {post.description}
         </div>
 
-        {/* External Link Section */}
-        <div className="mt-auto pt-6 text-center border-t-2 border-gray-300">
+        {/* Footer/Link Section */}
+        <div className="mt-auto">
           {post.media_link ? (
             <a 
               href={post.media_link.startsWith('http') ? post.media_link : `https://${post.media_link}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="font-vt323 text-2xl text-heritage-logo hover:underline hover:scale-105 transition-transform inline-block"
+              className="w-full flex justify-center items-center gap-3 p-4 bg-white border-2 border-black font-jersey text-2xl text-heritage-logo hover:bg-heritage-logo hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1"
             >
-              {post.media_link} 🔗
+              <Icon icon="pixelarticons:external-link" width="28" />
+              ACCESS MATERIAL
             </a>
           ) : (
-            <span className="font-vt323 text-gray-400">No external link provided</span>
+            <div className="text-center p-4 border-2 border-dashed border-black/20 font-vt323 text-xl text-gray-400">
+              [ NO EXTERNAL LINKS ATTACHED ]
+            </div>
           )}
         </div>
       </div>
 
       <button 
-        onClick={() => router.back()} 
-        className="mt-8 font-vt323 text-gray-500 hover:text-heritage-logo transition-colors text-xl"
+        onClick={() => router.push('/main')} 
+        className="mt-12 font-vt323 text-gray-400 hover:text-heritage-logo transition-colors text-2xl flex items-center gap-2"
       >
-        [ BACK TO LIST ]
+        <Icon icon="pixelarticons:arrow-left" />
+        RETURN TO ARCHIVE LIST
       </button>
 
-      {/* Toast Notification */}
-      {toast && (
-        <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />
-      )}
+      {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }

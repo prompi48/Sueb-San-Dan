@@ -24,70 +24,81 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false) // เพิ่มสถานะโหลด
-  const [showPassword, setShowPassword] = useState(false)           // เพิ่ม
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false) // เพิ่ม
+  const [showPassword, setShowPassword] = useState(false) // เพิ่ม State สำหรับ show/hide password
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false) // เพิ่ม State สำหรับ show/hide confirm password
   const router = useRouter()
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault() // ป้องกันหน้าเว็บรีโหลด
+const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-    // รายชื่อคำต้องห้าม
-    const reservedWords = ['admin', 'system', 'root', 'moderator', 'support', 'inheritance'];
-
-    // ตรวจสอบว่า Username ที่พิมพ์มา อยู่ในรายชื่อไหม
+    // --- [1. VALIDATION พื้นฐาน] ---
+    const reservedWords = ['admin', 'system', 'root', 'moderator', 'support', 'inheritance', 'null', 'undefined', 'void', 'select', 'insert', 'delete', 'update', 'drop', 'alter', 'create', 'table', 'database'];
     if (reservedWords.includes(username.toLowerCase())) {
-      return alert("This username is reserved. Please choose another one.");
+      return alert("This username is reserved.");
     }
 
-    // ตรวจสอบ Username: ภาษาอังกฤษ, ตัวเลข, _ และต้องยาว 3-16 ตัว
     const usernameRegex = /^[a-zA-Z0-9_]{3,16}$/
-
     if (!usernameRegex.test(username)) {
-      return alert("Username must be 3-16 characters and contain only English letters, numbers, or underscores.")
+      return alert("Username must be 3-16 characters (English letters, numbers, underscores).")
     }
 
-    // 2. เช็กว่ารหัสผ่านตรงกันไหม
-    if (password !== confirmPassword) {
-      return alert("Passwords do not match!")
-    }
-
-    if (password.length < 6) {
-      return alert("Password must be at least 6 characters.")
-    }
+    if (password !== confirmPassword) return alert("Passwords do not match!")
+    if (password.length < 6) return alert("Password must be at least 6 characters.")
 
     setIsLoading(true)
 
-    // 3. สมัครสมาชิกในระบบ Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-
-    if (authError) {
-      setIsLoading(false)
-      return alert(authError.message)
-    }
-
-    // 4. ถ้าสมัครผ่าน บันทึกลงตาราง profiles
-    if (authData.user) {
-      const { error: profileError } = await supabase
+    try {
+      // --- [2. ตรวจสอบ USERNAME ซ้ำในตาราง PROFILES] ---
+      // เราเช็คก่อนเลยว่ามีใครใช้ชื่อนี้หรือยัง เพื่อไม่ให้เกิดขยะในระบบ Auth
+      const { data: existingUser, error: checkError } = await supabase
         .from('profiles')
-        .insert([
-          { 
-            id: authData.user.id, 
-            user_name: username,
-            role: 'student' 
-          }
-        ])
+        .select('username')
+        .eq('username', username)
+        .single()
 
-      if (profileError) {
-        alert("Error saving profile: " + profileError.message)
-      } else {
+      if (existingUser) {
+        setIsLoading(false)
+        return alert("This username is already taken. Please choose another one.")
+      }
+
+      // --- [3. สมัครสมาชิกในระบบ AUTH] ---
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: email.trim().toLowerCase(),
+        password,
+      })
+
+      if (authError) {
+        setIsLoading(false)
+        return alert(authError.message)
+      }
+
+      // --- [4. บันทึกลงตาราง PROFILES] ---
+      if (authData.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            { 
+              id: authData.user.id, 
+              username: username,
+              role: 'student' 
+            }
+          ])
+
+        if (profileError) {
+          setIsLoading(false)
+          // กรณีหลุดรอดมาถึงตรงนี้ (Race Condition, username เดียวกันสมัครพร้อมกัน)
+          return alert(`Account created but profile failed: ${profileError.message}`);
+        }
+
         alert("Registration Successful! Welcome to Inheritance.")
         router.push('/main')
       }
+    } catch (err) {
+      console.error(err)
+      alert("An unexpected error occurred.")
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
 
   return (
