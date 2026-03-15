@@ -93,7 +93,7 @@ export default function PostDetailPage() {
         >
           INHERITANCE
         </h1>
-        <div className="font-vt323 text-xl bg-white border-2 border-black px-4 py-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] uppercase">
+        <div className="font-vt323 text-xl bg-white border-2 border-black px-4 py-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] uppercase max-w-[200px] break-all">
           ID: {post.subject_id}
         </div>
       </header>
@@ -103,10 +103,10 @@ export default function PostDetailPage() {
         {/* Title & Control Bar */}
         <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
           <div className="flex-1">
-            <h2 className="text-4xl md:text-6xl font-bold font-jersey text-heritage-logo mb-2 uppercase break-words leading-tight">
+            <h2 className="text-4xl md:text-6xl font-bold font-jersey text-heritage-logo mb-2 uppercase break-all leading-tight">
               {post.title}
             </h2>
-            <p className="text-xl font-prompt text-gray-600 font-bold">{post.subject_name}</p>
+            <p className="text-xl font-prompt text-gray-600 font-bold break-all">{post.subject_name}</p>
           </div>
 
           <div className="flex gap-3 font-jersey text-xl self-end md:self-start">
