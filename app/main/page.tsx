@@ -1,317 +1,283 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Toast } from '@/components/Toast';
 import { Icon } from '@iconify/react';
-import { Search } from 'lucide-react';
 
 export default function MainPage() {
-  const [allPosts, setAllPosts] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // --- States สำหรับ Data ---
+  const [posts, setPosts] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [showPending, setShowPending] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [undoData, setUndoData] = useState<{ id: number; type: string; timeoutId: NodeJS.Timeout } | null>(null);
-  const router = useRouter();
-  const [viewMode, setViewMode] = useState<'all' | 'admin' | 'mine'>('all');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-
-  // State สำหรับ Toast Notification
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
-  // --- States สำหรับ Search ---
-  const [searchQuery, setSearchQuery] = useState({
-    title: '',
-    subject_name: '',
-    subject_id: '',
-    author: ''
-  });
+  // --- States สำหรับ Pagination & URL ---
+  const POSTS_PER_PAGE = 30;
+  const currentPage = Number(searchParams.get('page')) || 1;
+  const [inputPage, setInputPage] = useState(currentPage.toString());
 
-  const postsPerPage = 20;
+  // --- States สำหรับ Search ---
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState({
+    title: searchParams.get('title') || '',
+    subject_id: searchParams.get('subject_id') || '',
+    subject_name: searchParams.get('subject_name') || '',
+    author: searchParams.get('author') || '',
+  });
+  const [tempSearch, setTempSearch] = useState(searchQuery);
+
+  // --- Fetch Data Logic ---
+  const fetchPosts = useCallback(async () => {
+    setLoading(true);
+    
+    // 1. ตรวจสอบ Session (เปลี่ยนจาก /login เป็น / เพราะคุณย้ายฟอร์มมาไว้หน้าแรก)
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return router.push('/');
+    setUser(session.user);
+
+    // 2. เช็คสิทธิ์ Admin จาก JWT
+    const userRole = session.user.app_metadata?.role;
+    if (userRole === 'admin') setIsAdmin(true);
+
+    const from = (currentPage - 1) * POSTS_PER_PAGE;
+    const to = from + POSTS_PER_PAGE - 1;
+
+    // 3. สร้าง Query
+    let query = supabase
+      .from('posts')
+      .select('*, profiles(username)', { count: 'exact' })
+      .eq('is_pending', false)
+      .order('created_at', { ascending: false })
+      .range(from, to);
+
+    // Apply Search Filters
+    if (searchQuery.title) query = query.ilike('title', `%${searchQuery.title}%`);
+    if (searchQuery.subject_id) query = query.ilike('subject_id', `%${searchQuery.subject_id}%`);
+    if (searchQuery.subject_name) query = query.ilike('subject_name', `%${searchQuery.subject_name}%`);
+    
+    // ค้นหาชื่อผู้เขียนผ่านการ Filter ตาราง Profiles (Join)
+    if (searchQuery.author) {
+      query = query.filter('profiles.username', 'ilike', `%${searchQuery.author}%`);
+    }
+
+    const { data, count, error } = await query;
+    if (!error) {
+      setPosts(data || []);
+      setTotalCount(count || 0);
+    }
+    setLoading(false);
+  }, [currentPage, searchQuery, router]);
 
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.push('/login');
-        return;
-      }
-      setUser(session.user);
+    fetchPosts();
+    setInputPage(currentPage.toString());
+  }, [fetchPosts, currentPage]);
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('username, is_admin')
-        .eq('id', session.user.id)
-        .single();
-
-      if (profile?.is_admin) setIsAdmin(true);
-
-      const { data: posts } = await supabase
-        .from('posts')
-        .select('*, profiles(username)')
-        .order('created_at', { ascending: false });
-
-      setAllPosts(posts || []);
-    };
-    checkUser();
-  }, [router]);
-
-  // --- Logic การ Action แบบหน่วงเวลา ---
-  const triggerAction = (id: number, type: string) => {
-    if (undoData) executeAction(undoData.id, undoData.type);
-    const timeoutId = setTimeout(() => {
-      executeAction(id, type);
-      setUndoData(null);
-    }, 5000);
-    setUndoData({ id, type, timeoutId });
+  // --- Helpers ---
+  const updateURL = (newPage: number, newSearch = searchQuery) => {
+    const params = new URLSearchParams();
+    params.set('page', newPage.toString());
+    if (newSearch.title) params.set('title', newSearch.title);
+    if (newSearch.subject_id) params.set('subject_id', newSearch.subject_id);
+    if (newSearch.subject_name) params.set('subject_name', newSearch.subject_name);
+    if (newSearch.author) params.set('author', newSearch.author);
+    router.push(`?${params.toString()}`);
   };
 
-  const executeAction = async (id: number, type: string) => {
-    if (type === 'delete') {
-      await supabase.from('posts').delete().eq('id', id);
-    } else {
-      const status = type === 'accept' ? 'accepted' : 'rejected';
-      await supabase.from('posts').update({ status }).eq('id', id);
-    }
-    setAllPosts(prev => prev.filter(p => p.id !== id));
-  };
-
-  const undoAction = () => {
-    if (undoData) {
-      clearTimeout(undoData.timeoutId);
-      setUndoData(null);
-    }
-  };
-
-  // --- Account Logic ---
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/login');
-  };
-
-  const handleDeleteAccount = async () => {
-    const confirmDelete = confirm("⚠️ คำเตือน: ข้อมูลโพสต์ทั้งหมดของคุณจะถูกลบและไม่สามารถกู้คืนได้ ยืนยันหรือไม่?");
-    if (confirmDelete) {
-      try {
-        // ลบข้อมูลที่เกี่ยวข้องกับ User ID นี้ทั้งหมด
-        await supabase.from('posts').delete().eq('author_id', user.id);
-        await supabase.from('profiles').delete().eq('id', user.id);
-
-        setToast({ msg: "ลบบัญชีเรียบร้อยแล้ว", type: 'success' });
-
-        setTimeout(async () => {
-          await supabase.auth.signOut();
-          router.push('/login');
-        }, 2000);
-      } catch (error) {
-        setToast({ msg: "เกิดข้อผิดพลาด", type: 'error' });
+  const handleJumpPage = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const pageNum = parseInt(inputPage);
+      if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+        updateURL(pageNum);
+      } else {
+        setInputPage(currentPage.toString());
       }
     }
   };
-
-  // --- Filter Logic ---
-  const filteredPosts = allPosts.filter(post => {
-    const matchesTitle = post.title?.toLowerCase().includes(searchQuery.title.toLowerCase());
-    const matchesSubjID = post.subject_id?.toLowerCase().includes(searchQuery.subject_id.toLowerCase());
-    const matchesSubjName = (post.subject_name || "").toLowerCase().includes(searchQuery.subject_name.toLowerCase());
-    const matchesAuthor = (post.profiles?.username || "").toLowerCase().includes(searchQuery.author.toLowerCase());
-
-    const isMatched = matchesTitle && matchesSubjID && matchesSubjName && matchesAuthor;
-    if (!isMatched) return false;
-
-    if (viewMode === 'admin') return post.status === 'pending';
-    if (viewMode === 'mine') return post.author_id === user?.id && post.status !== 'accepted';
-
-    return post.status === 'accepted' || post.author_id === user?.id;
-  });
-
-  const [tempSearch, setTempSearch] = useState({ title: '', subject_name: '', subject_id: '', author: '' });
 
   const handleSearchSubmit = () => {
     setSearchQuery(tempSearch);
-    setCurrentPage(1);
+    updateURL(1, tempSearch);
     setIsSearchOpen(false);
   };
 
-  const clearSearch = () => {
-    const empty = { title: '', subject_name: '', subject_id: '', author: '' };
-    setTempSearch(empty);
-    setSearchQuery(empty);
-    setIsSearchOpen(false);
+  const totalPages = Math.ceil(totalCount / POSTS_PER_PAGE);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
   };
 
-  /*กำหนดจำนวนโพสต์ต่อหน้า*/
-  const POSTS_PER_PAGE = 4;
+  // --- Delete Account Logic ---
+  const handleDeleteAccount = async () => {
+    const confirmed = confirm("Are you sure? This will delete your profile and account permanently. Your posts will remain as 'Deleted User'.");
+    if (!confirmed) return;
 
-  /*คำนวณตำแหน่งโพสต์*/
-  const indexOfLastPost = currentPage * POSTS_PER_PAGE;
-  const indexOfFirstPost = indexOfLastPost - POSTS_PER_PAGE;
+    setLoading(true);
+    // ลบที่ profiles แล้ว trigger ใน DB จะลบ auth.users ให้เอง
+    const { error } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', user?.id);
 
-  /*เลือกเฉพาะโพสต์ที่จะแสดง*/
-  const displayPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
+    if (error) {
+      setToast({ msg: "Failed to delete account: " + error.message, type: 'error' });
+      setLoading(false);
+    } else {
+      await supabase.auth.signOut();
+      router.push('/');
+    }
+  };
 
-  /*คำนวณจำนวนหน้าทั้งหมด*/
-  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+  if (loading && posts.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center font-jersey text-3xl animate-pulse text-heritage-logo">
+        RECOVERING DATA...
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen p-8">
-      {/* Header */}
+    <div className="min-h-screen p-8 bg-heritage-bg font-prompt">
       <header className="flex justify-between items-center mb-6">
-        <h1
-          className="text-4xl font-bold text-heritage-logo font-jersey cursor-pointer"
-          onClick={() => { setViewMode('all'); setShowPending(false); router.push('/main'); }}
+        <h1 
+          className="text-4xl font-bold text-heritage-logo font-jersey cursor-pointer select-none"
+          onClick={() => { updateURL(1, {title:'', subject_id:'', subject_name:'', author:''}); }}
         >
-          INHERITANCE {viewMode !== 'all' && <span className="text-sm ml-2">({viewMode.toUpperCase()})</span>}
+          INHERITANCE
         </h1>
 
         <div className="flex items-center gap-6">
-
           {isAdmin && (
-            <button
-            onClick={()=>router.push('/admin')}
-            className="btn-post"
-            >
-            ADMIN
-            </button>
-            )}
-          
-          <button onClick={() => setIsSearchOpen(true)} className="btn-search">
-            <Icon icon="pixelarticons:search" width="18" height="18" color="#679F9F" />
-            SEARCH
+            <button onClick={() => router.push('/admin')} className="btn-post bg-black text-white px-4 py-2 font-jersey">ADMIN AREA</button>
+          )}
+          <button onClick={() => setIsSearchOpen(true)} className="btn-search flex items-center gap-2">
+            <Icon icon="pixelarticons:search" width="18" /> SEARCH
           </button>
-          <button onClick={() => router.push('/create')} className="btn-post"> POST </button>
+          <button onClick={() => router.push('/create')} className="btn-post">POST</button>
 
           <div className="relative">
-            <span
-              className="font-semibold text-sm cursor-pointer hover:underline font-vt323"
-              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            >
-              {user?.email}
+            <span className="font-semibold text-sm cursor-pointer hover:underline font-vt323 px-2 py-1 bg-white/50 rounded" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
+              {user?.email} ▾
             </span>
-
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border-4 border-heritage-frame rounded-xl shadow-xl z-[60] py-2 font-vt323 text-lg">
-                <button
-                  onClick={() => { setViewMode('mine'); setIsUserMenuOpen(false); }}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 uppercase"
+              <div className="absolute right-0 mt-2 w-52 bg-white border-4 border-black rounded-sm shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] z-50 py-2 font-vt323 text-lg">
+                <div className="px-4 py-1 text-xs text-gray-400 border-b mb-1 uppercase tracking-tighter">Account Management</div>
+                <button onClick={handleSignOut} className="w-full text-left px-4 py-2 hover:bg-gray-100 uppercase">Logout</button>
+                <button 
+                  onClick={handleDeleteAccount} 
+                  className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 border-t border-dashed mt-1 uppercase"
                 >
-                  My Post Status
+                  Delete Account
                 </button>
-                <button
-                  onClick={handleSignOut}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600 uppercase"
-                >
-                  Logout
-                </button>
-                <div className="border-t border-gray-200 mt-2">
-                  <button
-                    onClick={handleDeleteAccount}
-                    className="w-full text-left px-4 py-2 text-xs text-red-400 hover:text-red-700 uppercase"
-                  >
-                    Delete Account
-                  </button>
-                </div>
               </div>
             )}
           </div>
         </div>
       </header>
 
-      {/* Grid Container */}
-      <div className="main-frame">
-        <div className="posts-grid">
-          {displayPosts.map((post) => (
-            <div
-              key={post.id}
-              className={`post-card group cursor-pointer ${viewMode === 'mine' && post.status === 'rejected' ? 'bg-[#F39C12] text-white' : 'bg-[#D9D9D9]'
-                }`}
-              onClick={() => router.push(`/post/${post.id}`)}
-            >
-              {viewMode === 'mine' && (
-                <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full mb-1 inline-block border border-black ${post.status === 'pending' ? 'bg-yellow-400 text-black' : 'bg-red-600 text-white'
-                  }`}>
-                  {post.status.toUpperCase()}
+      <div className="main-frame bg-[#D9D9D9] p-8 rounded-sm border-4 border-heritage-frame min-h-[70vh] flex flex-col relative shadow-inner">
+        {posts.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center opacity-30 font-jersey">
+            <Icon icon="pixelarticons:close-box" width="64" />
+            <p className="text-3xl mt-4 tracking-widest">NO ARCHIVES FOUND</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {posts.map((post) => (
+              <div 
+                key={post.id} 
+                className="post-card p-5 border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col h-full"
+                onClick={() => router.push(`/post/${post.id}`)}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-[10px] font-vt323 opacity-70 uppercase bg-gray-100 px-2 py-0.5 border border-black/10">
+                    {post.subject_id}
+                  </span>
                 </div>
-              )}
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-xl font-bold">{post.title}</h3>
-                <div className="flex flex-col items-end">
-                  <span className="text-sm text-gray-600 font-vt323">{post.subject_id}</span>
-                  {viewMode === 'mine' && post.status === 'rejected' && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); router.push(`/edit/${post.id}`); }}
-                      className="mt-2 text-xs bg-white text-black px-3 py-1 rounded-full border border-black hover:bg-gray-200 font-prompt"
-                    >
-                      EDIT & RESUBMIT
-                    </button>
-                  )}
-                  
+                <h3 className="text-xl font-bold mb-2 line-clamp-1 text-heritage-logo">{post.title}</h3>
+                <p className="text-sm font-prompt line-clamp-3 opacity-80 mb-4 flex-grow">{post.description}</p>
+                
+                <div className="flex justify-between items-end text-xs font-vt323 mt-auto border-t pt-2">
+                  <span className="font-bold text-black/70">
+                    {/* แก้จุด By Deleted User ที่นี่ */}
+                    {post.profiles?.username || "Deleted User"}
+                  </span>
+                  <span className="opacity-50">{new Date(post.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
-              <p className="text-sm mb-6 line-clamp-3 font-prompt opacity-90">{post.description}</p>
-              <div className="flex justify-between items-end text-xs font-prompt">
-                <div className="flex flex-col">
-                  <span className="text-heritage-frame mb-1 truncate max-w-[150px]">{post.media_link || "No link"}</span>
-                  <span className="font-semibold text-black">{post.profiles?.username}</span>
-                </div>
-                <span>{new Date(post.created_at).toLocaleDateString()}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
-        {/* Pagination */}
-        <div className="pagination-wrapper mt-8 flex justify-center items-center gap-4">
-          <button className="pagination-btn" onClick={() => setCurrentPage(1)}>{"<<"}</button>
-          <button className="pagination-btn" onClick={() => setCurrentPage(p => Math.max(1, p - 1))}>{"<"}</button>
-          <span className="font-jersey text-2xl">{currentPage} / {totalPages || 1}</span>
-          <button className="pagination-btn" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}>{">"}</button>
-          <button className="pagination-btn" onClick={() => setCurrentPage(totalPages)}>{">>"}</button>
-        </div>
+        {/* Pagination Control */}
+        {totalPages > 1 && (
+          <div className="mt-auto pt-8 flex justify-center items-center gap-4 font-jersey text-2xl">
+            <button disabled={currentPage <= 1} onClick={() => updateURL(1)} className="disabled:opacity-20 hover:text-heritage-logo transition-colors">{"<<"}</button>
+            <button disabled={currentPage <= 1} onClick={() => updateURL(currentPage - 1)} className="disabled:opacity-20 hover:text-heritage-logo transition-colors">{"<"}</button>
+            
+            <div className="flex items-center gap-2 bg-white border-2 border-black px-4 py-1 rounded-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <input
+                type="text"
+                value={inputPage}
+                onChange={(e) => setInputPage(e.target.value)}
+                onKeyDown={handleJumpPage}
+                onBlur={() => setInputPage(currentPage.toString())}
+                className="w-12 text-center bg-transparent border-b-2 border-heritage-logo focus:outline-none font-bold text-heritage-logo"
+              />
+              <span className="text-gray-400 font-prompt text-sm">/</span>
+              <span>{totalPages}</span>
+            </div>
+
+            <button disabled={currentPage >= totalPages} onClick={() => updateURL(currentPage + 1)} className="disabled:opacity-20 hover:text-heritage-logo transition-colors">{">"}</button>
+            <button disabled={currentPage >= totalPages} onClick={() => updateURL(totalPages)} className="disabled:opacity-20 hover:text-heritage-logo transition-colors">{">>"}</button>
+          </div>
+        )}
       </div>
 
-      {/* Modals & Toasts */}
+      {/* Search Modal */}
       {isSearchOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-          <div className="search-modal relative bg-[#d44c24] p-8 rounded-3xl border-4 border-white">
-            <button onClick={() => setIsSearchOpen(false)} className="absolute top-4 right-6 text-white text-2xl font-bold">X</button>
-            <h2 className="text-white font-prompt text-center mb-6 text-lg">ค้นหาแนวข้อสอบ / สรุปวิชา</h2>
-            <div className="space-y-4 font-prompt">
-              <input type="text" placeholder="ชื่อโพสต์" className="search-input w-full p-3 rounded-xl" value={tempSearch.title} onChange={(e) => setTempSearch({ ...tempSearch, title: e.target.value })} />
-              <div className="grid grid-cols-2 gap-4">
-                <input type="text" placeholder="รหัสวิชา" className="search-input p-3 rounded-xl" value={tempSearch.subject_id} onChange={(e) => setTempSearch({ ...tempSearch, subject_id: e.target.value })} />
-                <input type="text" placeholder="ชื่อวิชา" className="search-input p-3 rounded-xl" value={tempSearch.subject_name} onChange={(e) => setTempSearch({ ...tempSearch, subject_name: e.target.value })} />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-[100] p-4">
+          <div className="bg-[#d44c24] p-8 rounded-sm border-4 border-white w-full max-w-md shadow-[10px_10px_0px_0px_rgba(0,0,0,0.5)] relative">
+            <button onClick={() => setIsSearchOpen(false)} className="absolute top-2 right-4 text-white text-2xl font-bold hover:scale-110 transition-transform">×</button>
+            <h2 className="text-white font-jersey text-center mb-6 text-3xl tracking-widest uppercase">Archive Search</h2>
+            <div className="space-y-4 font-prompt text-sm">
+              <div className="space-y-1">
+                <label className="text-white/70 text-[10px] font-bold ml-2">TITLE</label>
+                <input type="text" placeholder="ชื่อโพสต์..." className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/20" value={tempSearch.title} onChange={(e) => setTempSearch({ ...tempSearch, title: e.target.value })} />
               </div>
-              <input type="text" placeholder="ชื่อผู้เขียน" className="search-input w-full p-3 rounded-xl" value={tempSearch.author} onChange={(e) => setTempSearch({ ...tempSearch, author: e.target.value })} />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-white/70 text-[10px] font-bold ml-2">SUBJECT ID</label>
+                  <input type="text" placeholder="รหัสวิชา" className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/20" value={tempSearch.subject_id} onChange={(e) => setTempSearch({ ...tempSearch, subject_id: e.target.value })} />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-white/70 text-[10px] font-bold ml-2">SUBJECT NAME</label>
+                  <input type="text" placeholder="ชื่อวิชา" className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/20" value={tempSearch.subject_name} onChange={(e) => setTempSearch({ ...tempSearch, subject_name: e.target.value })} />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-white/70 text-[10px] font-bold ml-2">AUTHOR</label>
+                <input type="text" placeholder="เจ้าของโพสต์..." className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/20" value={tempSearch.author} onChange={(e) => setTempSearch({ ...tempSearch, author: e.target.value })} />
+              </div>
             </div>
-            <div className="flex gap-3 mt-8">
-              <button onClick={clearSearch} className="flex-1 py-3 bg-gray-500 text-white rounded-full font-bold">CLEAR</button>
-              <button onClick={handleSearchSubmit} className="flex-[2] py-3 bg-[#6CAFA5] text-white rounded-full font-bold shadow-lg">SEARCH NOW</button>
+            <div className="flex gap-3 mt-8 font-jersey text-xl">
+              <button onClick={() => setTempSearch({title:'', subject_id:'', subject_name:'', author:''})} className="flex-1 py-3 bg-gray-500 text-white border-2 border-black hover:brightness-110 transition-all">CLEAR</button>
+              <button onClick={handleSearchSubmit} className="flex-[2] py-3 bg-[#6CAFA5] text-white border-2 border-black hover:brightness-110 transition-all">SEARCH</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Undo Snackbar */}
-      {undoData && (
-        <div className={`undo-snackbar fixed bottom-10 right-10 flex items-center gap-4 p-4 rounded-xl text-white shadow-2xl z-50 ${undoData.type === 'delete' ? 'bg-[#E63946]' : 'bg-[#276F50]'
-          }`}>
-          <span className="font-prompt">ทำรายการสำเร็จ (5 วินาทีเพื่อกู้คืน)</span>
-          <button onClick={undoAction} className="border-2 border-white px-4 py-1 rounded-full text-sm font-bold hover:bg-white/20">UNDO</button>
-        </div>
-      )}
-
-      {/* Success Toast */}
-      {toast && (
-        <Toast
-          message={toast.msg}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+      {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }
