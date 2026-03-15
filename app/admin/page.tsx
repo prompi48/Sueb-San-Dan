@@ -77,7 +77,13 @@ export default function AdminPage() {
   const executeDatabaseAction = async (id: number, type: 'accept' | 'delete') => {
     if (type === 'accept') {
       // เปลี่ยนจาก pending เป็น accepted (is_pending: false)
-      await supabase.from('posts').update({ is_pending: false }).eq('id', id);
+    const { error } = await supabase
+      .from('posts')
+      .update({ is_pending: false })
+      .eq('id', id);
+
+    if (error) console.error('Approve Error:', error.message);
+
     } else {
       // ปฏิเสธ = ลบทิ้งออกจากระบบ
       await supabase.from('posts').delete().eq('id', id);
