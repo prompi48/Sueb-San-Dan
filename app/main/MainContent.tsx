@@ -238,19 +238,22 @@ export default function MainContent() {
           {isAdmin && (
             <button 
               onClick={() => router.push('/admin')} 
-              className="flex items-center gap-2 bg-kaset-green text-dark-green px-4 py-2 font-jersey shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]"
+              className="btn btn-admin relative"
             >
               <Icon icon="solar:crown-linear" width="20" />
-              ADMIN AREA
+              ADMIN
             </button>
           )}
-          <button onClick={() => setIsSearchOpen(true)} className="btn-search flex items-center gap-2">
+          <button onClick={() => setIsSearchOpen(true)} className="btn btn-search relative">
             <Icon icon="pixelarticons:search" width="18" /> SEARCH
           </button>
-          <button onClick={() => router.push('/create')} className="btn-post">POST</button>
+          <button onClick={() => router.push('/create')} className="btn btn-post">POST</button>
 
           <div className="relative">
-            <span className="font-semibold text-sm cursor-pointer hover:underline font-vt323 px-3 py-1 bg-white border-2 border-black rounded-sm shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
+            <span 
+              className="font-semibold text-sm cursor-pointer hover:underline font-vt323 px-3 py-1 bg-white border-2 border-black rounded-sm shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]" 
+              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+            >
               {currentUsername || user?.email} ▾
             </span>
             {isUserMenuOpen && (
