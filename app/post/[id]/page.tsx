@@ -103,7 +103,7 @@ export default function PostDetailPage() {
             <h2 className="text-4xl md:text-6xl font-bold font-jersey text-heritage-logo mb-2 uppercase break-all leading-tight">
               {post.title}
             </h2>
-            <p className="text-xl font-prompt text-gray-600 font-bold break-all">{post.subject_name}</p>
+            <p className="text-xl font-prompt text-gray-600 font-bold break-all">{post.subject_name || '-'}</p>
           </div>
 
           <div className="flex gap-3 font-jersey text-xl self-end md:self-start shrink-0">
@@ -131,7 +131,7 @@ export default function PostDetailPage() {
         <div className="flex flex-wrap gap-6 mb-8 font-vt323 text-2xl text-black/60 border-y-2 border-black/5 py-4">
           <div className="flex items-center gap-2">
             <Icon icon="la:book-solid" />
-            <span>{post.subject_id}</span>
+            <span>{post.subject_id|| '-'}</span>
           </div>
           <div className="flex items-center gap-2">
             <Icon icon="pixelarticons:user" />
