@@ -245,7 +245,7 @@ export default function MainContent() {
 
           <div className="relative">
             <span className="font-semibold text-sm cursor-pointer hover:underline font-vt323 px-3 py-1 bg-white border-2 border-black rounded-sm shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
-              {user?.email} ▾
+              {currentUsername || user?.email} ▾
             </span>
             {isUserMenuOpen && (
               <div className="absolute right-0 mt-2 w-96 bg-white border-4 border-black rounded-sm shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] z-50 py-3 font-vt323 text-2xl">
