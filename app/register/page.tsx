@@ -83,7 +83,7 @@ if (passValidationError) return alert(passValidationError);
     <main className="min-h-screen w-full bg-heritage-bg flex items-center justify-center p-4 md:p-[100px]">
       <div className="w-full h-full max-w-[1720px] max-h-[880px] bg-heritage-bg border-[10px] border-heritage-frame rounded-[50px] shadow-lg flex flex-col items-center justify-center p-10">
         
-        <h1 className="font-jersey text-[70px] md:text-[80px] text-heritage-logo drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] mb-10 tracking-wider text-center">
+        <h1 className="font-jersey text-[70px] md:text-[80px] text-dark-green drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] mb-10 tracking-wider text-center">
           INHERITANCE
         </h1>
 
@@ -119,7 +119,7 @@ if (passValidationError) return alert(passValidationError);
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-heritage-logo transition-colors"
+              className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-dark-green transition-colors"
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               <Icon icon={showPassword ? 'pixelarticons:eye-closed' : 'pixelarticons:eye'} width="24" />
@@ -140,7 +140,7 @@ if (passValidationError) return alert(passValidationError);
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-heritage-logo transition-colors"
+              className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-dark-green transition-colors"
               aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
             >
               <Icon icon={showConfirmPassword ? 'pixelarticons:eye-closed' : 'pixelarticons:eye'} width="24" />
@@ -151,7 +151,7 @@ if (passValidationError) return alert(passValidationError);
             <button 
               disabled={isLoading}
               type="submit" 
-              className="w-[200px] h-[60px] bg-heritage-btn rounded-full text-2xl font-bold text-[#E1F5FE] hover:brightness-90 transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none disabled:opacity-50"
+              className="w-[200px] h-[60px] bg-dark-green rounded-full text-2xl font-bold text-[#E1F5FE] hover:brightness-90 transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none disabled:opacity-50"
             >
               {isLoading ? '...' : 'REGISTER'}
             </button>
@@ -159,7 +159,7 @@ if (passValidationError) return alert(passValidationError);
         </form>
 
         <div className="mt-8">
-          <Link href="/" className="text-heritage-logo font-bold hover:underline">
+          <Link href="/" className="text-dark-green font-bold hover:underline">
             ← Back to Login
           </Link>
         </div>

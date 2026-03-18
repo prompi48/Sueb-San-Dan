@@ -76,7 +76,7 @@ export default function PostDetailPage() {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center font-jersey text-3xl text-heritage-logo bg-heritage-bg animate-pulse">
+    <div className="min-h-screen flex items-center justify-center font-jersey text-3xl text-dark-green bg-heritage-bg animate-pulse">
       RETRIEVING ARCHIVE
     </div>
   );
@@ -88,7 +88,7 @@ export default function PostDetailPage() {
     <div className="min-h-screen p-8 flex flex-col items-center bg-heritage-bg font-prompt">
       <header className="w-full max-w-6xl flex justify-between items-center mb-10">
         <h1 
-          className="text-4xl font-bold text-heritage-logo font-jersey cursor-pointer select-none" 
+          className="text-4xl font-bold text-dark-green font-jersey cursor-pointer select-none" 
           onClick={() => router.push('/main')}
         >
           INHERITANCE
@@ -100,7 +100,7 @@ export default function PostDetailPage() {
         {/* Title & Control Bar */}
         <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
           <div className="flex-1 min-w-0">
-            <h2 className="text-4xl md:text-6xl font-bold font-jersey text-heritage-logo mb-2 uppercase break-all leading-tight">
+            <h2 className="text-4xl md:text-6xl font-bold font-jersey text-dark-green mb-2 uppercase break-all leading-tight">
               {post.title}
             </h2>
             <p className="text-xl font-prompt text-gray-600 font-bold break-all">{post.subject_name || '-'}</p>
@@ -155,7 +155,7 @@ export default function PostDetailPage() {
               href={post.media_link.startsWith('http') ? post.media_link : `https://${post.media_link}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="w-full flex justify-center items-center gap-3 p-4 bg-white border-2 border-black font-jersey text-2xl text-heritage-logo hover:bg-heritage-logo hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1"
+              className="w-full flex justify-center items-center gap-3 p-4 bg-white border-2 border-black font-jersey text-2xl text-dark-green hover:bg-dark-green hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1"
             >
               <Icon icon="pixelarticons:external-link" width="28" />
               ACCESS MATERIAL
@@ -170,7 +170,7 @@ export default function PostDetailPage() {
 
       <button 
         onClick={() => router.push('/main')} 
-        className="mt-12 font-vt323 text-gray-400 hover:text-heritage-logo transition-colors text-2xl flex items-center gap-2"
+        className="mt-12 font-vt323 text-gray-400 hover:text-dark-green transition-colors text-2xl flex items-center gap-2"
       >
         <Icon icon="pixelarticons:arrow-left" />
         RETURN TO ARCHIVE LIST

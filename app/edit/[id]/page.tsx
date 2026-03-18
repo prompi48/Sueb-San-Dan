@@ -78,7 +78,7 @@ export default function EditPage() {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-heritage-bg font-jersey text-3xl tracking-tighter text-heritage-logo">
+    <div className="min-h-screen flex items-center justify-center bg-heritage-bg font-jersey text-3xl tracking-tighter text-dark-green">
       ACCESSING ARCHIVE
     </div>
   );
@@ -87,7 +87,7 @@ export default function EditPage() {
     <div className="min-h-screen p-8 flex flex-col items-center bg-heritage-bg font-prompt">
       <header className="w-full max-w-4xl flex justify-between items-end mb-10 border-b-2 border-black/10 pb-4">
         <div>
-          <h1 className="text-4xl font-bold text-heritage-logo font-jersey cursor-pointer" onClick={() => router.push('/main')}>
+          <h1 className="text-4xl font-bold text-dark-green font-jersey cursor-pointer" onClick={() => router.push('/main')}>
             INHERITANCE
           </h1>
           <p className="text-[10px] font-bold opacity-50 uppercase tracking-widest">Archive Modification Module</p>
