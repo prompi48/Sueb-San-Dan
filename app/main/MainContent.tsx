@@ -228,15 +228,18 @@ export default function MainContent() {
                 className="post-card p-5 border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex flex-col h-full active:translate-y-0 active:shadow-none"
                 onClick={() => router.push(`/post/${post.id}`)}
               >
+                {/*
                 <div className="flex justify-between items-start mb-2">
                   <span className="text-[10px] font-vt323 font-bold uppercase bg-black text-white px-2 py-0.5">
                     {post.subject_id}
                   </span>
                 </div>
-                  <h3 className="text-xl font-bold mb-2 line-clamp-1 text-heritage-logo uppercase break-all">{post.title}</h3>
+                */}
+                  <h3 className="text-xl font-black mb-2 line-clamp-1 text-heritage-logo uppercase break-all drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">{post.title}</h3>
+                  <p className="text-xs font-prompt text-black/50 mb-2">{post.subject_name} : {post.subject_id}</p>
                   <p className="text-sm font-prompt line-clamp-3 opacity-80 mb-4 flex-grow italic leading-relaxed break-all">
                   "{post.description}"
-                </p>
+                  </p>
                 
                 <div className="flex justify-between items-end text-xs font-vt323 mt-auto border-t-2 border-dashed pt-2 border-black/5">
                   <span className="font-bold text-black/70">
