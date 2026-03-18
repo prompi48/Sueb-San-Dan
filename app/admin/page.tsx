@@ -113,7 +113,7 @@ export default function AdminPage() {
   // แสดง Loading ระหว่างเช็คสิทธิ์เพื่อความปลอดภัย
   if (isChecking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 font-jersey text-2xl tracking-widest text-heritage-logo">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 font-jersey text-2xl tracking-widest text-dark-green">
         VALIDATING AUTHORITY
       </div>
     );
@@ -124,11 +124,11 @@ export default function AdminPage() {
       <div className="flex justify-between items-center mb-10 border-b-4 border-black pb-4">
         <div>
           <h1 
-            className="text-4xl font-bold font-jersey text-heritage-logo cursor-pointer select-none flex items-center group"
+            className="text-4xl font-bold font-jersey text-dark-green cursor-pointer select-none flex items-center group"
             onClick={handleExit}
           >
             <span className="group-hover:opacity-80 transition-opacity">INHERITANCE</span>
-            <span className="ml-4 text-2xl opacity-60 border-l-2 border-heritage-logo/20 pl-4 py-1 font-prompt tracking-normal group-hover:text-black transition-colors">
+            <span className="ml-4 text-2xl opacity-60 border-l-2 border-dark-green/20 pl-4 py-1 font-prompt tracking-normal group-hover:text-black transition-colors">
               ADMIN QUEUE
             </span>
           </h1>
@@ -160,7 +160,7 @@ export default function AdminPage() {
         <span className="text-[10px] font-bold bg-black text-white px-2 py-0.5">{post.subject_id}</span>
         <span className="text-[10px] opacity-40">{new Date(post.created_at).toLocaleString()}</span>
       </div>
-      <h2 className="text-xl font-bold mb-2 text-heritage-logo break-all">{post.title}</h2>
+      <h2 className="text-xl font-bold mb-2 text-dark-green break-all">{post.title}</h2>
 
       {/* Description — expands on click */}
       <p 
@@ -185,7 +185,7 @@ export default function AdminPage() {
           href={post.media_link.startsWith('http') ? post.media_link : `https://${post.media_link}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-xs font-bold text-heritage-logo underline mt-2 break-all"
+          className="flex items-center gap-2 text-xs font-bold text-dark-green underline mt-2 break-all"
         >
           <Icon icon="pixelarticons:external-link" width="14" />
           {post.media_link}

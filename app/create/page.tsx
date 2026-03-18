@@ -48,13 +48,13 @@ export default function CreatePage() {
     <div className="min-h-screen p-8 flex flex-col items-center bg-heritage-bg font-prompt">
       <header className="w-full max-w-5xl flex justify-between items-center mb-10">
         <h1 
-          className="text-4xl font-bold text-heritage-logo font-jersey cursor-pointer select-none" 
+          className="text-4xl font-bold text-dark-green font-jersey cursor-pointer select-none" 
           onClick={() => router.push('/main')}
         >
           INHERITANCE
         </h1>
         <div className="flex flex-col items-end">
-          <span className="font-vt323 text-xl text-heritage-logo uppercase tracking-widest">New Submission</span>
+          <span className="font-vt323 text-xl text-dark-green uppercase tracking-widest">New Submission</span>
           <span className="font-vt323 text-sm opacity-50">{user?.email}</span>
         </div>
       </header>

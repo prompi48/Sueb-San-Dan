@@ -218,7 +218,7 @@ export default function MainContent() {
 
   if (loading && posts.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center font-jersey text-3xl animate-pulse text-heritage-logo">
+      <div className="min-h-screen flex items-center justify-center font-jersey text-3xl animate-pulse text-dark-green">
         ACCESSING ARCHIVES
       </div>
     );
@@ -228,7 +228,7 @@ export default function MainContent() {
     <div className="min-h-screen p-8 bg-heritage-bg font-prompt">
       <header className="flex justify-between items-center mb-6">
         <h1 
-          className="text-4xl font-bold text-heritage-logo font-jersey cursor-pointer select-none"
+          className="text-4xl font-bold text-dark-green font-jersey cursor-pointer select-none"
           onClick={() => { updateURL(1, {title:'', subject_id:'', subject_name:'', author:''}); }}
         >
           INHERITANCE
@@ -262,7 +262,7 @@ export default function MainContent() {
                         onChange={(e) => setNewUsername(e.target.value.toLowerCase())}
                         placeholder={currentUsername}
                         maxLength={16}
-                        className="w-full px-2 py-1 border-2 border-black text-sm font-prompt focus:outline-none focus:ring-2 ring-heritage-logo/30"
+                        className="w-full px-2 py-1 border-2 border-black text-sm font-prompt focus:outline-none focus:ring-2 ring-dark-green/30"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') handleUpdateUsername();
                           if (e.key === 'Escape') { setIsEditingUsername(false); setNewUsername(''); }
@@ -286,7 +286,7 @@ export default function MainContent() {
                     </div>
                   ) : (
                     <div className="flex justify-between items-center">
-                      <span className="font-bold text-heritage-logo text-2xl">{currentUsername || '—'}</span>
+                      <span className="font-bold text-dark-green text-2xl">{currentUsername || '—'}</span>
                       <button
                         onClick={() => { setIsEditingUsername(true); setNewUsername(currentUsername); }}
                         className="text-sm uppercase opacity-40 hover:opacity-100 transition-opacity font-bold"
@@ -306,7 +306,7 @@ export default function MainContent() {
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="New password"
-                        className="w-full px-2 py-1 border-2 border-black text-sm font-prompt focus:outline-none focus:ring-2 ring-heritage-logo/30"
+                        className="w-full px-2 py-1 border-2 border-black text-sm font-prompt focus:outline-none focus:ring-2 ring-dark-green/30"
                         autoFocus
                       />
                       <input
@@ -314,7 +314,7 @@ export default function MainContent() {
                         value={confirmNewPassword}
                         onChange={(e) => setConfirmNewPassword(e.target.value)}
                         placeholder="Confirm new password"
-                        className="w-full px-2 py-1 border-2 border-black text-sm font-prompt focus:outline-none focus:ring-2 ring-heritage-logo/30"
+                        className="w-full px-2 py-1 border-2 border-black text-sm font-prompt focus:outline-none focus:ring-2 ring-dark-green/30"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') handleUpdatePassword();
                           if (e.key === 'Escape') {
@@ -345,7 +345,7 @@ export default function MainContent() {
                     </div>
                   ) : (
                     <div className="flex justify-between items-center">
-                      <span className="font-bold text-heritage-logo text-2xl">•••• TOP SECRET ••••</span>
+                      <span className="font-bold text-dark-green text-2xl">•••• TOP SECRET ••••</span>
                       <button
                         onClick={() => setIsChangingPassword(true)}
                         className="text-sm uppercase opacity-40 hover:opacity-100 transition-opacity font-bold"
@@ -388,7 +388,7 @@ export default function MainContent() {
                   </span>
                 </div>
                 */}
-                  <h3 className="text-xl font-black mb-2 line-clamp-1 text-heritage-logo uppercase break-all drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">{post.title}</h3>
+                  <h3 className="text-xl font-black mb-2 line-clamp-1 text-dark-green uppercase break-all drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">{post.title}</h3>
                   <p className="text-xs font-prompt text-black/50 mb-2">{post.subject_name} : {post.subject_id}</p>
                   <p className="text-sm font-prompt line-clamp-3 opacity-80 mb-4 flex-grow italic leading-relaxed break-all">
                   "{post.description}"
@@ -408,8 +408,8 @@ export default function MainContent() {
         {/* Pagination Control */}
         {totalPages > 1 && (
           <div className="mt-auto pt-8 flex justify-center items-center gap-6 font-jersey text-2xl">
-            <button disabled={currentPage <= 1} onClick={() => updateURL(1)} className="disabled:opacity-20 hover:text-heritage-logo transition-colors font-bold">{"<<"}</button>
-            <button disabled={currentPage <= 1} onClick={() => updateURL(currentPage - 1)} className="disabled:opacity-20 hover:text-heritage-logo transition-colors font-bold">{"<"}</button>
+            <button disabled={currentPage <= 1} onClick={() => updateURL(1)} className="disabled:opacity-20 hover:text-dark-green transition-colors font-bold">{"<<"}</button>
+            <button disabled={currentPage <= 1} onClick={() => updateURL(currentPage - 1)} className="disabled:opacity-20 hover:text-dark-green transition-colors font-bold">{"<"}</button>
             
             <div className="flex items-center gap-3 bg-white border-2 border-black px-4 py-1 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
               <input
@@ -418,14 +418,14 @@ export default function MainContent() {
                 onChange={(e) => setInputPage(e.target.value)}
                 onKeyDown={handleJumpPage}
                 onBlur={() => setInputPage(currentPage.toString())}
-                className="w-10 text-center bg-transparent border-b-2 border-heritage-logo focus:outline-none font-bold text-heritage-logo"
+                className="w-10 text-center bg-transparent border-b-2 border-dark-green focus:outline-none font-bold text-dark-green"
               />
               <span className="text-gray-300 font-prompt text-sm font-bold">/</span>
               <span>{totalPages}</span>
             </div>
 
-            <button disabled={currentPage >= totalPages} onClick={() => updateURL(currentPage + 1)} className="disabled:opacity-20 hover:text-heritage-logo transition-colors font-bold">{">"}</button>
-            <button disabled={currentPage >= totalPages} onClick={() => updateURL(totalPages)} className="disabled:opacity-20 hover:text-heritage-logo transition-colors font-bold">{">>"}</button>
+            <button disabled={currentPage >= totalPages} onClick={() => updateURL(currentPage + 1)} className="disabled:opacity-20 hover:text-dark-green transition-colors font-bold">{">"}</button>
+            <button disabled={currentPage >= totalPages} onClick={() => updateURL(totalPages)} className="disabled:opacity-20 hover:text-dark-green transition-colors font-bold">{">>"}</button>
           </div>
         )}
       </div>

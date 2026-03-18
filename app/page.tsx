@@ -68,7 +68,7 @@ export default function LoginPage() {
     <main className="min-h-screen w-full bg-heritage-bg flex items-center justify-center p-4 md:p-[100px]">
       <div className="w-full h-full max-w-[1720px] max-h-[880px] bg-heritage-bg border-[10px] border-heritage-frame rounded-[50px] shadow-lg flex flex-col items-center justify-center p-10">
         
-        <h1 className="font-jersey text-[80px] md:text-[96px] text-heritage-logo drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] mb-16 tracking-wider text-center">
+        <h1 className="font-jersey text-[80px] md:text-[96px] text-dark-green drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] mb-16 tracking-wider text-center">
           INHERITANCE
         </h1>
 

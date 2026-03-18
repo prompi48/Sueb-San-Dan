@@ -48,7 +48,7 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
             type="text" 
             maxLength={300}
             placeholder="ชื่อโพสต์ เช่น สรุป Logic Design กลางภาค" 
-            className="w-full p-4 bg-white border-2 border-black rounded-sm focus:ring-4 ring-heritage-logo/20 outline-none"
+            className="w-full p-4 bg-white border-2 border-black rounded-sm focus:ring-4 ring-dark-green/20 outline-none"
             value={formData.title}
             onChange={(e) => setFormData({...formData, title: e.target.value})}
             required
@@ -61,7 +61,7 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
               type="text" 
               maxLength={100}
               placeholder="ชื่อวิชา" 
-              className="w-full p-4 bg-white border-2 border-black rounded-sm outline-none focus:ring-4 ring-heritage-logo/20"
+              className="w-full p-4 bg-white border-2 border-black rounded-sm outline-none focus:ring-4 ring-dark-green/20"
               value={formData.subject_name}
               onChange={(e) => setFormData({...formData, subject_name: e.target.value})}
             />
@@ -72,7 +72,7 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
               type="text" 
               maxLength={20}
               placeholder="รหัสวิชา (เช่น 010113xxx)" 
-              className="w-full p-4 bg-white border-2 border-black rounded-sm outline-none focus:ring-4 ring-heritage-logo/20"
+              className="w-full p-4 bg-white border-2 border-black rounded-sm outline-none focus:ring-4 ring-dark-green/20"
               value={formData.subject_id}
               onChange={(e) => setFormData({...formData, subject_id: e.target.value})}
             />
@@ -84,7 +84,7 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
             maxLength={40000}
             placeholder="คำอธิบาย หรือ รายละเอียดเพิ่มเติม" 
             rows={6}
-            className="w-full p-4 bg-white border-2 border-black rounded-sm outline-none focus:ring-4 ring-heritage-logo/20 resize-none"
+            className="w-full p-4 bg-white border-2 border-black rounded-sm outline-none focus:ring-4 ring-dark-green/20 resize-none"
             value={formData.description}
             onChange={(e) => setFormData({...formData, description: e.target.value})}
           />
