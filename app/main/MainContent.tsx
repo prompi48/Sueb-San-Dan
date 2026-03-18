@@ -236,7 +236,13 @@ export default function MainContent() {
 
         <div className="flex items-center gap-6">
           {isAdmin && (
-            <button onClick={() => router.push('/admin')} className="btn-post bg-black text-white px-4 py-2 font-jersey shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]">ADMIN AREA</button>
+            <button 
+              onClick={() => router.push('/admin')} 
+              className="flex items-center gap-2 bg-kaset-green text-dark-green px-4 py-2 font-jersey shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]"
+            >
+              <Icon icon="solar:crown-linear" width="20" />
+              ADMIN AREA
+            </button>
           )}
           <button onClick={() => setIsSearchOpen(true)} className="btn-search flex items-center gap-2">
             <Icon icon="pixelarticons:search" width="18" /> SEARCH
