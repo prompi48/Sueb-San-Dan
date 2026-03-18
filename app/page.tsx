@@ -4,12 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Icon } from '@iconify/react';
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(true); // เพิ่ม State สำหรับตอนเช็ค Session แรกเริ่ม
+  const [showPassword, setShowPassword] = useState(false); //show/hide password
   const router = useRouter();
 
   useEffect(() => {
@@ -80,14 +82,23 @@ export default function LoginPage() {
             className="w-full h-[70px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center"
           />
 
+        <div className="relative w-full">
           <input 
             required
-            type="password" 
+            type={showPassword ? 'text' : 'password'}
             placeholder="PASSWORD" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full h-[70px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center"
           />
+          <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <Icon icon={showPassword ? 'pixelarticons:eye-closed' : 'pixelarticons:eye'} width="24" />
+            </button>
+          </div>
 
           <div className="flex justify-center mt-2">
             <button 

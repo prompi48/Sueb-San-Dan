@@ -3,20 +3,7 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-
-// ไอคอน Eye / Eye-Off
-const EyeIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-  </svg>
-)
-
-const EyeOffIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-7 0-1.07.37-2.07 1-2.9M6.1 6.1A8.965 8.965 0 0112 5c5 0 9 4 9 7a8.96 8.96 0 01-2.1 3.9M3 3l18 18" />
-  </svg>
-)
+import { Icon } from '@iconify/react';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -139,7 +126,7 @@ const handleRegister = async (e: React.FormEvent) => {
               className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-heritage-logo transition-colors"
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+              <Icon icon={showPassword ? 'pixelarticons:eye-closed' : 'pixelarticons:eye'} width="24" />
             </button>
 
           </div>
@@ -160,7 +147,7 @@ const handleRegister = async (e: React.FormEvent) => {
               className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-heritage-logo transition-colors"
               aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
             >
-              {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+              <Icon icon={showConfirmPassword ? 'pixelarticons:eye-closed' : 'pixelarticons:eye'} width="24" />
             </button>
           </div>
 
