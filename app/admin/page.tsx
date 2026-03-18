@@ -156,10 +156,6 @@ export default function AdminPage() {
     className="p-6 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-sm flex flex-col justify-between"
   >
     <div>
-      <div className="flex justify-between items-center mb-4 border-b-2 border-dashed border-gray-200 pb-2">
-        <span className="text-[10px] font-bold bg-black text-white px-2 py-0.5">{post.subject_id}</span>
-        <span className="text-[10px] opacity-40">{new Date(post.created_at).toLocaleString()}</span>
-      </div>
       <h2 className="text-xl font-bold mb-2 text-dark-green break-all">{post.title}</h2>
 
       {/* Description — expands on click */}
@@ -168,7 +164,7 @@ export default function AdminPage() {
         className={`text-sm text-gray-600 mb-2 leading-relaxed italic cursor-pointer select-none transition-all
           ${expandedId === post.id ? '' : 'line-clamp-4'} break-all`}
       >
-        "{post.description}"
+        {post.description}
       </p>
 
       {/* Expand/collapse hint */}
@@ -192,9 +188,14 @@ export default function AdminPage() {
         </a>
       )}
 
-      {/* Subject name — only visible when expanded */}
-      {expandedId === post.id && post.subject_name && (
-        <p className="text-xs opacity-50 mt-1 font-bold uppercase">{post.subject_name}</p>
+      {/* Subject name | Subject ID and time — only visible when expanded */}
+      {expandedId === post.id && (
+        <div className="mt-2 space-y-1">
+          <p className="text-xs font-prompt text-black/50 font-bold uppercase">
+            {post.subject_name || '-'} | {post.subject_id || '-'}
+          </p>
+          <p className="text-[10px] opacity-40">{new Date(post.created_at).toLocaleString()}</p>
+        </div>
       )}
     </div>
 

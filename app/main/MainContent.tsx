@@ -395,9 +395,9 @@ export default function MainContent() {
                 </div>
                 */}
                   <h3 className="text-xl font-black mb-2 line-clamp-1 text-dark-green uppercase break-all drop-shadow-[2px_2px_0px_rgba(0,0,0,0.2)]">{post.title}</h3>
-                  <p className="text-xs font-prompt text-black/50 mb-2">{post.subject_name} : {post.subject_id}</p>
+                  <p className="text-xs font-prompt text-black/50 mb-2">{post.subject_name} | {post.subject_id}</p>
                   <p className="text-sm font-prompt line-clamp-3 opacity-80 mb-4 flex-grow italic leading-relaxed break-all">
-                  "{post.description}"
+                  {post.description}
                   </p>
                 
                 <div className="flex justify-between items-end text-xs font-vt323 mt-auto border-t-2 border-dashed pt-2 border-black/5">
