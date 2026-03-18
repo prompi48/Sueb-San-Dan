@@ -27,7 +27,6 @@ export default function EditPage() {
       setLoading(true);
       
       const { data: { session } } = await supabase.auth.getSession();
-      // แก้ Path จาก /login เป็น / ให้ตรงกับระบบปัจจุบัน
       if (!session) return router.push('/');
 
       const { data, error } = await supabase
@@ -67,7 +66,6 @@ export default function EditPage() {
     const { error } = await supabase
       .from('posts')
       .update(formData) 
-      // โพสต์ที่เคยผ่าน Admin มาแล้ว เมื่อแก้ข้อมูลจะไม่เด้งกลับไป Pending (ตามที่คุณเลือกไว้)
       .eq('id', id);
 
     if (error) {
@@ -81,7 +79,7 @@ export default function EditPage() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-heritage-bg font-jersey text-3xl tracking-tighter text-heritage-logo">
-      ACCESSING ARCHIVE...
+      ACCESSING ARCHIVE
     </div>
   );
 

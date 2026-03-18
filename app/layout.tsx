@@ -16,11 +16,11 @@ const geistMono = Geist_Mono({
 const jersey10 = Jersey_10({
   weight: "400",
   subsets: ["latin"],
-  variable: "--font-jersey", // ชื่อตัวแปรต้องตรงกับใน globals.css
+  variable: "--font-jersey",
 });
 
 export const metadata: Metadata = {
-  title: "Inheritance - มรดกวิชา", // เปลี่ยนชื่อเว็บให้เข้ากับโปรเจกต์สักหน่อย
+  title: "Inheritance - มรดกวิชา",
   description: "ระบบสืบสันดานวิชาจากรุ่นพี่สู่รุ่นน้อง",
 };
 
@@ -32,7 +32,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        /* 3. เพิ่ม ${jersey10.variable} เข้าไปใน className */
         className={`${geistSans.variable} ${geistMono.variable} ${jersey10.variable} antialiased`}
       >
         {children}

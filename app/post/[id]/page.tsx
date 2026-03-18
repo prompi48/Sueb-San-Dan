@@ -77,7 +77,7 @@ export default function PostDetailPage() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center font-jersey text-3xl text-heritage-logo bg-heritage-bg animate-pulse">
-      RETRIEVING ARCHIVE...
+      RETRIEVING ARCHIVE
     </div>
   );
 
@@ -93,9 +93,6 @@ export default function PostDetailPage() {
         >
           INHERITANCE
         </h1>
-        <div className="font-vt323 text-xl bg-white border-2 border-black px-4 py-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] uppercase max-w-[250px] break-all">
-          Subject ID: {post.subject_id}
-        </div>
       </header>
 
       <div className="main-frame max-w-5xl w-full p-8 md:p-12 bg-[#D9D9D9] border-4 border-heritage-frame shadow-[16px_16px_0px_0px_rgba(0,0,0,0.1)] relative min-h-[500px] flex flex-col overflow-hidden">
@@ -106,7 +103,7 @@ export default function PostDetailPage() {
             <h2 className="text-4xl md:text-6xl font-bold font-jersey text-heritage-logo mb-2 uppercase break-all leading-tight">
               {post.title}
             </h2>
-            <p className="text-xl font-prompt text-gray-600 font-bold break-all">{post.subject_name}</p>
+            <p className="text-xl font-prompt text-gray-600 font-bold break-all">{post.subject_name || '-'}</p>
           </div>
 
           <div className="flex gap-3 font-jersey text-xl self-end md:self-start shrink-0">
@@ -132,6 +129,10 @@ export default function PostDetailPage() {
 
         {/* Info Header */}
         <div className="flex flex-wrap gap-6 mb-8 font-vt323 text-2xl text-black/60 border-y-2 border-black/5 py-4">
+          <div className="flex items-center gap-2">
+            <Icon icon="la:book-solid" />
+            <span>{post.subject_id|| '-'}</span>
+          </div>
           <div className="flex items-center gap-2">
             <Icon icon="pixelarticons:user" />
             <span>{post.profiles?.username || "Deleted User"}</span>

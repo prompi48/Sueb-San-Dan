@@ -6,9 +6,9 @@ import { Icon } from '@iconify/react'; // เปลี่ยนมาใช้ I
 interface PostFormProps {
   initialData?: {
     title: string;
-    subject_name: string;
-    subject_id: string;
-    description: string;
+    subject_name: string | null;
+    subject_id: string | null;
+    description: string  | null;
     media_link: string | null;
   };
   onSubmit: (data: any) => void;
@@ -24,13 +24,19 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
     media_link: initialData?.media_link || '' 
   });
 
-const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
-  onSubmit({
-    ...formData,
-    media_link: formData.media_link.trim() || null 
-  });
-};
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const cleanedData = {
+      title: formData.title.trim(),
+      subject_name: formData.subject_name.trim() || null,
+      subject_id: formData.subject_id.trim() || null,
+      description: formData.description.trim() || null,
+      media_link: formData.media_link.trim() || null
+    };
+
+    onSubmit(cleanedData);
+  };
 
   return (
     <div className="main-frame max-w-4xl w-full bg-[#D9D9D9] p-10 border-4 border-heritage-frame shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
@@ -40,8 +46,8 @@ const handleSubmit = (e: React.FormEvent) => {
           <label className="text-[10px] font-bold ml-4 uppercase opacity-50">Post Title</label>
           <input 
             type="text" 
-            maxLength={100}
-            placeholder="เช่น สรุป Logic Design กลางภาค" 
+            maxLength={300}
+            placeholder="ชื่อโพสต์ เช่น สรุป Logic Design กลางภาค" 
             className="w-full p-4 bg-white border-2 border-black rounded-sm focus:ring-4 ring-heritage-logo/20 outline-none"
             value={formData.title}
             onChange={(e) => setFormData({...formData, title: e.target.value})}
@@ -49,7 +55,6 @@ const handleSubmit = (e: React.FormEvent) => {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-1">
             <label className="text-[10px] font-bold ml-4 uppercase opacity-50">Subject Name</label>
             <input 
@@ -70,21 +75,18 @@ const handleSubmit = (e: React.FormEvent) => {
               className="w-full p-4 bg-white border-2 border-black rounded-sm outline-none focus:ring-4 ring-heritage-logo/20"
               value={formData.subject_id}
               onChange={(e) => setFormData({...formData, subject_id: e.target.value})}
-              required
             />
           </div>
-        </div>
 
         <div className="space-y-1">
           <label className="text-[10px] font-bold ml-4 uppercase opacity-50">Description</label>
           <textarea 
-            maxLength={2000}
-            placeholder="รายละเอียดเพิ่มเติม..." 
+            maxLength={40000}
+            placeholder="คำอธิบาย หรือ รายละเอียดเพิ่มเติม" 
             rows={6}
             className="w-full p-4 bg-white border-2 border-black rounded-sm outline-none focus:ring-4 ring-heritage-logo/20 resize-none"
             value={formData.description}
             onChange={(e) => setFormData({...formData, description: e.target.value})}
-            required
           />
         </div>
 

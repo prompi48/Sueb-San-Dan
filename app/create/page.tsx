@@ -15,7 +15,6 @@ export default function CreatePage() {
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        // เปลี่ยนจาก /login เป็น / (หน้าแรกที่คุณใช้ Login)
         router.push('/');
       } else {
         setUser(session.user);
@@ -33,7 +32,7 @@ export default function CreatePage() {
         { 
           ...formData, 
           author_id: user.id, 
-          is_pending: true // ใช้ระบบ boolean ตามที่ตกลงกันไว้
+          is_pending: true
         }
       ]);
 
@@ -41,7 +40,6 @@ export default function CreatePage() {
       setToast({ msg: "เกิดข้อผิดพลาดในการสร้างโพสต์: " + error.message, type: 'error' });
     } else {
       setToast({ msg: "ส่งโพสต์สำเร็จ! กำลังรอการตรวจสอบจากทีม Admin", type: 'success' });
-      // หน่วงเวลาให้คนอ่าน Toast แป๊บนึงแล้วค่อยกลับหน้า Main
       setTimeout(() => router.push('/main'), 2000);
     }
   };

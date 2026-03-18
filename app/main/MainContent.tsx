@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Toast } from '@/components/Toast';
 import { Icon } from '@iconify/react';
 
+import { validateUsername, validatePassword } from '@/lib/validation';
+
 // --- แยก Logic หลักออกมาเป็น Component ย่อย ---
 export default function MainContent() {
   const router = useRouter();
@@ -19,6 +21,12 @@ export default function MainContent() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [currentUsername, setCurrentUsername] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
   // --- States สำหรับ Pagination & URL ---
   const POSTS_PER_PAGE = 30;
@@ -39,6 +47,7 @@ export default function MainContent() {
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     
+    
     // 1. ตรวจสอบ Session
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return router.push('/');
@@ -47,13 +56,11 @@ export default function MainContent() {
     // 2. เช็คสิทธิ์ Admin จากตาราง Profiles (เพื่อความแม่นยำกว่า Metadata)
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role,username')
       .eq('id', session.user.id)
       .single();
-    
-    // if (profile?.role === 'admin') setIsAdmin(true);
-    // else setIsAdmin(false);
 
+    setCurrentUsername(profile?.username || '');
     setIsAdmin(profile?.role === 'admin');
 
     const from = (currentPage - 1) * POSTS_PER_PAGE;
@@ -167,10 +174,52 @@ export default function MainContent() {
     }
   };
 
+  const handleUpdateUsername = async () => {
+    const trimmed = newUsername.trim().toLowerCase();
+
+    const usernameValidation = validateUsername(trimmed);
+    if (usernameValidation) { setToast({ msg: usernameValidation, type: 'error' }); return; }
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ username: trimmed })
+      .eq('id', user?.id);
+
+    if (error) {
+      // Unique constraint violation
+      if (error.code === '23505') {
+        setToast({ msg: "Username already taken.", type: 'error' });
+      } else {
+        setToast({ msg: "Failed to update: " + error.message, type: 'error' });
+      }
+    } else {
+      setCurrentUsername(trimmed);
+      setToast({ msg: "Username updated successfully!", type: 'success' });
+      setIsEditingUsername(false);
+      setNewUsername('');
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    const passValidationError = validatePassword(newPassword, confirmNewPassword);
+    if (passValidationError) return alert(passValidationError);
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      setToast({ msg: "Failed to update password: " + error.message, type: 'error' });
+    } else {
+      setToast({ msg: "Password updated successfully!", type: 'success' });
+      setIsChangingPassword(false);
+      setNewPassword('');
+      setConfirmNewPassword('');
+    }
+  };
+
   if (loading && posts.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center font-jersey text-3xl animate-pulse text-heritage-logo">
-        ACCESSING ARCHIVES...
+        ACCESSING ARCHIVES
       </div>
     );
   }
@@ -199,13 +248,117 @@ export default function MainContent() {
               {user?.email} ▾
             </span>
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-52 bg-white border-4 border-black rounded-sm shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] z-50 py-2 font-vt323 text-lg">
-                <div className="px-4 py-1 text-[10px] text-gray-400 border-b mb-1 uppercase font-bold tracking-widest">User Settings</div>
-                <button onClick={handleSignOut} className="w-full text-left px-4 py-2 hover:bg-gray-100 uppercase">Logout</button>
-                <button 
-                  onClick={handleDeleteAccount} 
-                  className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 border-t border-dashed mt-1 uppercase"
-                >
+              <div className="absolute right-0 mt-2 w-96 bg-white border-4 border-black rounded-sm shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] z-50 py-3 font-vt323 text-2xl">
+                <div className="px-6 py-2 text-sm text-gray-400 border-b mb-2 uppercase font-bold tracking-widest">User Settings</div>
+                
+                {/* Username display + edit toggle */}
+                <div className="px-6 py-3 border-b border-dashed">
+                  <p className="text-sm text-gray-400 uppercase font-bold mb-2">Username</p>
+                  {isEditingUsername ? (
+                    <div className="flex flex-col gap-2">
+                      <input
+                        type="text"
+                        value={newUsername}
+                        onChange={(e) => setNewUsername(e.target.value.toLowerCase())}
+                        placeholder={currentUsername}
+                        maxLength={16}
+                        className="w-full px-2 py-1 border-2 border-black text-sm font-prompt focus:outline-none focus:ring-2 ring-heritage-logo/30"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleUpdateUsername();
+                          if (e.key === 'Escape') { setIsEditingUsername(false); setNewUsername(''); }
+                        }}
+                        autoFocus
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleUpdateUsername}
+                          className="flex-1 py-2 bg-[#6CAFA5] text-white text-base border-2 border-black hover:brightness-110 transition-all"
+                        >
+                          SAVE
+                        </button>
+                        <button
+                          onClick={() => { setIsEditingUsername(false); setNewUsername(''); }}
+                          className="flex-1 py-2 bg-gray-100 text-black text-base border-2 border-black hover:bg-gray-200 transition-all"
+                        >
+                          CANCEL
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-heritage-logo text-2xl">{currentUsername || '—'}</span>
+                      <button
+                        onClick={() => { setIsEditingUsername(true); setNewUsername(currentUsername); }}
+                        className="text-sm uppercase opacity-40 hover:opacity-100 transition-opacity font-bold"
+                      >
+                        EDIT
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {/* Password change section */}
+                <div className="px-6 py-3 border-b border-dashed">
+                  <p className="text-sm text-gray-400 uppercase font-bold mb-2">Password</p>
+                  {isChangingPassword ? (
+                    <div className="flex flex-col gap-2">
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="New password"
+                        className="w-full px-2 py-1 border-2 border-black text-sm font-prompt focus:outline-none focus:ring-2 ring-heritage-logo/30"
+                        autoFocus
+                      />
+                      <input
+                        type="password"
+                        value={confirmNewPassword}
+                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                        placeholder="Confirm new password"
+                        className="w-full px-2 py-1 border-2 border-black text-sm font-prompt focus:outline-none focus:ring-2 ring-heritage-logo/30"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleUpdatePassword();
+                          if (e.key === 'Escape') {
+                            setIsChangingPassword(false);
+                            setNewPassword('');
+                            setConfirmNewPassword('');
+                          }
+                        }}
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleUpdatePassword}
+                          className="flex-1 py-2 bg-[#6CAFA5] text-white text-base border-2 border-black hover:brightness-110 transition-all"
+                        >
+                          SAVE
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsChangingPassword(false);
+                            setNewPassword('');
+                            setConfirmNewPassword('');
+                          }}
+                          className="flex-1 py-2 bg-gray-100 text-black text-base border-2 border-black hover:bg-gray-200 transition-all"
+                        >
+                          CANCEL
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-heritage-logo text-2xl">•••• TOP SECRET ••••</span>
+                      <button
+                        onClick={() => setIsChangingPassword(true)}
+                        className="text-sm uppercase opacity-40 hover:opacity-100 transition-opacity font-bold"
+                      >
+                        CHANGE
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <button onClick={handleSignOut} className="w-full text-left px-6 py-3 hover:bg-gray-100 uppercase">
+                  Logout
+                </button>
+                <button onClick={handleDeleteAccount} className="w-full text-left px-6 py-3 hover:bg-red-50 text-red-600 border-t border-dashed mt-1 uppercase">
                   Delete Account
                 </button>
               </div>
@@ -280,32 +433,74 @@ export default function MainContent() {
       {/* Search Modal */}
       {isSearchOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-[100] p-4 animate-in fade-in duration-200">
-          <div className="bg-[#d44c24] p-8 rounded-sm border-4 border-white w-full max-w-md shadow-[10px_10px_0px_0px_rgba(0,0,0,0.5)] relative">
+          <div className="bg-[#679F9F] p-8 rounded-sm border-4 border-white w-full max-w-md shadow-[10px_10px_0px_0px_rgba(0,0,0,0.5)] relative">
+            
             <button onClick={() => setIsSearchOpen(false)} className="absolute top-2 right-4 text-white text-3xl font-bold hover:rotate-90 transition-transform">×</button>
+            
             <h2 className="text-white font-jersey text-center mb-6 text-3xl tracking-widest uppercase">Archive Search</h2>
+            
             <div className="space-y-4 font-prompt text-sm">
+              {/* Input Boxes: BG White, Text #939393 */}
               <div className="space-y-1">
                 <label className="text-white/70 text-[10px] font-bold ml-2">TITLE</label>
-                <input type="text" placeholder="ชื่อโพสต์..." className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/30" value={tempSearch.title} onChange={(e) => setTempSearch({ ...tempSearch, title: e.target.value })} />
+                <input 
+                  type="text" 
+                  placeholder="ชื่อโพสต์"
+                  className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/30 bg-white text-gray placeholder:text-gray/60" 
+                  value={tempSearch.title} 
+                  onChange={(e) => setTempSearch({ ...tempSearch, title: e.target.value })} 
+                />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-white/70 text-[10px] font-bold ml-2">SUBJECT ID</label>
-                  <input type="text" placeholder="รหัสวิชา" className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/30" value={tempSearch.subject_id} onChange={(e) => setTempSearch({ ...tempSearch, subject_id: e.target.value })} />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-white/70 text-[10px] font-bold ml-2">SUBJECT NAME</label>
-                  <input type="text" placeholder="ชื่อวิชา" className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/30" value={tempSearch.subject_name} onChange={(e) => setTempSearch({ ...tempSearch, subject_name: e.target.value })} />
-                </div>
+
+              <div className="space-y-1">
+                <label className="text-white/70 text-[10px] font-bold ml-2">SUBJECT NAME</label>
+                <input 
+                  type="text" 
+                  placeholder="ชื่อวิชา" 
+                  className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/30 bg-white text-gray placeholder:text-gray/60"  
+                  value={tempSearch.subject_name} 
+                  onChange={(e) => setTempSearch({ ...tempSearch, subject_name: e.target.value })} 
+                />
               </div>
+
+              <div className="space-y-1">
+                <label className="text-white/70 text-[10px] font-bold ml-2">SUBJECT ID</label>
+                <input 
+                  type="text" 
+                  placeholder="รหัสวิชา" 
+                  className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/30 bg-white text-gray placeholder:text-gray/60"  
+                  value={tempSearch.subject_id} 
+                  onChange={(e) => setTempSearch({ ...tempSearch, subject_id: e.target.value })} 
+                />
+              </div>
+
               <div className="space-y-1">
                 <label className="text-white/70 text-[10px] font-bold ml-2">AUTHOR</label>
-                <input type="text" placeholder="เจ้าของโพสต์..." className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/30" value={tempSearch.author} onChange={(e) => setTempSearch({ ...tempSearch, author: e.target.value })} />
+                <input 
+                  type="text" 
+                  placeholder="เจ้าของโพสต์" 
+                  className="w-full p-3 border-2 border-black rounded-sm outline-none focus:ring-4 ring-white/30 bg-white text-gray placeholder:text-gray/60"  
+                  value={tempSearch.author} 
+                  onChange={(e) => setTempSearch({ ...tempSearch, author: e.target.value })} 
+                />
               </div>
             </div>
+
             <div className="flex gap-4 mt-8 font-jersey text-2xl">
-              <button onClick={() => setTempSearch({title:'', subject_id:'', subject_name:'', author:''})} className="flex-1 py-3 bg-white/20 text-white border-2 border-white hover:bg-white/30 transition-all">CLEAR</button>
-              <button onClick={handleSearchSubmit} className="flex-[2] py-3 bg-white text-[#d44c24] border-2 border-black hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all">EXECUTE</button>
+              <button 
+                onClick={() => setTempSearch({title:'', subject_id:'', subject_name:'', author:''})} 
+                className="flex-1 py-3 bg-white/20 text-white border-2 border-white hover:bg-white/30 transition-all"
+              >
+                CLEAR
+              </button>
+
+              {/* EXECUTE Button: Text changed to #679F9F to match theme */}
+              <button 
+                onClick={handleSearchSubmit} 
+                className="flex-[2] py-3 bg-white text-[#679F9F] border-2 border-black hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none transition-all"
+              >
+                EXECUTE
+              </button>
             </div>
           </div>
         </div>
