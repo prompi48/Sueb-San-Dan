@@ -100,11 +100,21 @@ export default function AdminPage() {
     }
   };
 
+  const handleExit = async () => {
+  if (pendingRef.current) {
+    clearTimeout(pendingRef.current.timeoutId);
+    await executeDatabaseAction(pendingRef.current.id, pendingRef.current.type);
+    setPendingAction(null);
+    pendingRef.current = null;
+  }
+  router.push('/main');
+};
+
   // แสดง Loading ระหว่างเช็คสิทธิ์เพื่อความปลอดภัย
   if (isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 font-jersey text-2xl tracking-widest text-heritage-logo">
-        VALIDATING AUTHORITY...
+        VALIDATING AUTHORITY
       </div>
     );
   }
@@ -113,19 +123,19 @@ export default function AdminPage() {
     <div className="min-h-screen p-10 bg-gray-50 font-prompt">
       <div className="flex justify-between items-center mb-10 border-b-4 border-black pb-4">
         <div>
-          <h1 className="text-4xl font-bold font-jersey text-heritage-logo">ADMIN QUEUE</h1>
+          <h1 
+            className="text-4xl font-bold font-jersey text-heritage-logo cursor-pointer select-none flex items-center group"
+            onClick={handleExit}
+          >
+            <span className="group-hover:opacity-80 transition-opacity">INHERITANCE</span>
+            <span className="ml-4 text-2xl opacity-60 border-l-2 border-heritage-logo/20 pl-4 py-1 font-prompt tracking-normal group-hover:text-black transition-colors">
+              ADMIN QUEUE
+            </span>
+          </h1>
           <p className="text-xs font-bold opacity-50 uppercase tracking-tighter">Review pending archives for approval</p>
         </div>
         <button 
-          onClick={async () => {
-            if (pendingRef.current) {
-              clearTimeout(pendingRef.current.timeoutId);
-              await executeDatabaseAction(pendingRef.current.id, pendingRef.current.type);
-              setPendingAction(null);
-              pendingRef.current = null;
-            }
-            router.push('/main');
-          }} 
+          onClick={handleExit}
           className="font-jersey text-xl bg-white border-2 border-black px-4 py-1 hover:bg-black hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none"
         >
           BACK TO MAIN

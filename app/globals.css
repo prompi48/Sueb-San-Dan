@@ -9,7 +9,10 @@
   --color-heritage-btn: #1B4332;
   --color-heritage-input: #BFD6E8;
   --color-heritage-register: #F9E79F;
-  --color-heritage-post: #F7ED92;
+  --color-mango: #F7ED92;
+  --color-kaset-green: #679F9F;
+  --color-sky-blue: #BCD8F1;
+  --color-light-green: #A9E5D6;
 
   --font-jersey: "Jersey 10", sans-serif;
   --font-vt323: "VT323", monospace;
@@ -47,31 +50,9 @@
   position: relative;
 }
 
-/*จัด layout ของโพสต์ให้แสดงเป็นตาราง 2 คอลัมน์*/
-.posts-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 คอลัมน์ */
-  gap: 30px;
-}
-
 .post-card:hover {
   transform: translate(-4px, -4px);
   box-shadow: 8px 8px 0px rgba(108, 175, 165, 0.4);
-}
-
-/* --- Snackbar สำหรับ Delayed Request --- */
-.undo-snackbar {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  padding: 0.75rem 2rem;
-  border-radius: 9999px; /* มนแบบแคปซูลตามรูป d44baf */
-  color: white;
-  z-index: 100;
-  animation: slideIn 0.3s ease-out;
 }
 
 @keyframes slideIn {
@@ -80,17 +61,12 @@
 }
 
 .search-modal {
-  background-color: #135A42; /* สีส้มตามรูป image_c789a7.png */
+  background-color: #135A42;
   border: 4px solid white;
   border-radius: 40px;
   padding: 3rem;
   width: 100%;
   max-width: 600px;
-}
-
-.search-input {
-  @apply w-full p-4 bg-transparent border-b-2 border-white/30 text-white
-         placeholder:text-white/50 focus:outline-none focus:border-white transition-all;
 }
 
 .btn-search {
@@ -122,10 +98,9 @@
   box-shadow: 0 8px 0 rgba(0,0,0,0.25);
 }
 
-/*ปรับตำแหน่งของไอคอน*/
 .btn-search svg{
   position: absolute;
-  left: 14px;      /* ปรับระยะตรงนี้ */
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
 }
@@ -145,7 +120,7 @@
   border-radius: 999px;
 
   font-family: var(--font-jersey);
-  font-size: 26px;   /* ลดจาก 40 */
+  font-size: 26px;
   letter-spacing: 2px;
 
   padding: 0;

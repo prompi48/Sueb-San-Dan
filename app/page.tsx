@@ -59,7 +59,7 @@ export default function LoginPage() {
   if (isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-heritage-bg font-jersey text-4xl animate-pulse">
-        RECALLING ARCHIVE...
+        RECALLING ARCHIVE
       </div>
     );
   }
@@ -104,7 +104,7 @@ export default function LoginPage() {
             <button 
               disabled={isLoading}
               type="submit" 
-              className="w-[200px] h-[65px] bg-heritage-btn rounded-full text-2xl font-bold text-[#E1F5FE] hover:brightness-90 transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none disabled:opacity-50"
+              className="w-[200px] h-[65px] bg-kaset-green rounded-full text-2xl font-bold text-white hover:brightness-90 transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none disabled:opacity-50"
             >
               {isLoading ? '...' : 'LOG IN'}
             </button>
@@ -114,7 +114,7 @@ export default function LoginPage() {
         <div className="flex flex-col md:flex-row items-center gap-4 mt-16 text-lg text-[#171717] font-medium">
           <p>Don&apos;t have an account yet?</p>
           <Link href="/register">
-            <span className="px-8 py-2 bg-heritage-register rounded-full text-heritage-logo font-bold hover:brightness-95 transition-all shadow-[0_3px_0_0_rgba(0,0,0,0.1)] active:translate-y-0.5 active:shadow-none cursor-pointer">
+            <span className="px-8 py-2 bg-heritage-register rounded-full text-kaset-green font-bold hover:brightness-95 transition-all shadow-[0_3px_0_0_rgba(0,0,0,0.1)] active:translate-y-0.5 active:shadow-none cursor-pointer">
               Sign Up
             </span>
           </Link>

@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Icon } from '@iconify/react';
 
+import { validateUsername, validatePassword } from '@/lib/validation';
+
+
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
@@ -19,18 +22,12 @@ const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
 
     // --- [1. VALIDATION พื้นฐาน] ---
-    const reservedWords = ['admin', 'system', 'root', 'moderator', 'support', 'inheritance', 'null', 'undefined', 'void', 'select', 'insert', 'delete', 'update', 'drop', 'alter', 'create', 'table', 'database'];
-    if (reservedWords.includes(username.toLowerCase())) {
-      return alert("This username is reserved.");
-    }
+    const usernameValidation = validateUsername(username);
+    if (usernameValidation) return alert(usernameValidation);
 
-    const usernameRegex = /^[a-zA-Z0-9_]{3,16}$/
-    if (!usernameRegex.test(username)) {
-      return alert("Username must be 3-16 characters (English letters, numbers, underscores).")
-    }
 
-    if (password !== confirmPassword) return alert("Passwords do not match!")
-    if (password.length < 6) return alert("Password must be at least 6 characters.")
+const passValidationError = validatePassword(password, confirmPassword);
+if (passValidationError) return alert(passValidationError);
 
     setIsLoading(true)
 
@@ -104,13 +101,12 @@ const handleRegister = async (e: React.FormEvent) => {
             type="text" 
             placeholder="USERNAME" 
             value={username}
-            onChange={(e) => setUsername(e.target.value.toLowerCase())}//allow only lowercase in username for search and consistency
+            onChange={(e) => setUsername(e.target.value.toLowerCase())}
             className="w-full h-[65px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center"
           />
 
           {/* PASSWORD พร้อมปุ่ม show/hide */}
           <div className="relative w-full">
-
             <input 
               required
               type={showPassword ? 'text' : 'password'} 
