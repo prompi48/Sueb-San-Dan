@@ -251,10 +251,10 @@ export default function MainContent() {
 
           <div className="relative">
             <span 
-              className="font-semibold text-sm cursor-pointer hover:underline font-vt323 px-3 py-1 bg-white border-2 border-black rounded-sm shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]" 
+              className="font-vt323 text-sm cursor-pointer px-4 py-1.5 bg-dark-green text-[#E8E8C8] border-2 border-black rounded-full shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:brightness-110 transition-all flex items-center gap-1.5 select-none" 
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             >
-              {currentUsername || user?.email} ▾
+              {currentUsername || user?.email} <span className="opacity-60 text-xs">▾</span>
             </span>
             {isUserMenuOpen && (
               <div className="absolute right-0 mt-2 w-96 bg-white border-4 border-black rounded-sm shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] z-50 py-3 font-vt323 text-2xl">
