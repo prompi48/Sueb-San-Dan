@@ -234,28 +234,28 @@ export default function MainContent() {
           INHERITANCE
         </h1>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-6">
           {isAdmin && (
             <button 
               onClick={() => router.push('/admin')} 
-              className="btn btn-admin"
+              className="btn btn-admin relative"
             >
-              <Icon icon="solar:crown-linear" width="16" />
+              <Icon icon="solar:crown-linear" width="20" />
               ADMIN
             </button>
           )}
-          <button onClick={() => setIsSearchOpen(true)} className="btn btn-search">
-            <Icon icon="pixelarticons:search" width="16" /> SEARCH
+          <button onClick={() => setIsSearchOpen(true)} className="btn btn-search relative">
+            <Icon icon="pixelarticons:search" width="18" /> SEARCH
           </button>
           <button onClick={() => router.push('/create')} className="btn btn-post">POST</button>
 
           <div className="relative">
-            <button 
-              className="btn btn-user"
+            <span 
+              className="font-vt323 text-sm cursor-pointer px-4 py-1.5 bg-dark-green text-[#E8E8C8] border-2 border-black rounded-full shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:brightness-110 transition-all flex items-center gap-1.5 select-none" 
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             >
-              {currentUsername || user?.email} ▾
-            </button>
+              {currentUsername || user?.email} <span className="opacity-60 text-xs">▾</span>
+            </span>
             {isUserMenuOpen && (
               <div className="absolute right-0 mt-2 w-96 bg-white border-4 border-black rounded-sm shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] z-50 py-3 font-vt323 text-2xl">
                 <div className="px-6 py-2 text-sm text-gray-400 border-b mb-2 uppercase font-bold tracking-widest">User Settings</div>

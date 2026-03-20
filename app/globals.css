@@ -69,13 +69,56 @@
 }
 
 .btn {
-  @apply flex items-center gap-1.5 px-4 py-1.5 text-sm font-bold font-jersey
-         border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]
-         hover:-translate-y-px hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
-         active:translate-y-0 active:shadow-none transition-all;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 45px;
+  padding: 0;
+  border-radius: 999px;
+  font-family: var(--font-jersey);
+  font-size: 26px;
+  letter-spacing: 2px;
+  line-height: 1;
+  transition: all 0.15s ease;
 }
 
-.btn-admin  { @apply bg-white text-dark-green; }
-.btn-search { @apply bg-white text-dark-green; }
-.btn-post   { @apply bg-dark-green text-white; }
-.btn-user   { @apply bg-white text-dark-green; }
+.btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 0 rgba(0,0,0,0.25);
+}
+
+.btn-search {
+  padding-left: 14px;
+  background: #135A42;
+  color: #679F9F;
+  box-shadow: inset -3px -4px 4.5px rgba(0,0,0,0.25);
+}
+
+.btn-search svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.btn-post {
+  background: #F7ED92;
+  color: #679F9F;
+  box-shadow: inset -5px -7px 4.5px rgba(0,0,0,0.25),
+              inset 3px 3px 6px rgba(255,255,255,0.35);
+}
+
+.btn-admin {
+  padding-left: 14px;
+  background: #679F9F;
+  color: #135A42;
+  box-shadow: inset -3px -4px 4.5px rgba(0,0,0,0.25);
+}
+
+.btn-admin svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+}
