@@ -1,0 +1,47 @@
+.container {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-heritage-bg, #f5f0e8);
+  font-family: 'Prompt', sans-serif;
+}
+
+.header {
+  width: 100%;
+  max-width: 64rem; /* max-w-5xl */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.logo {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-dark-green, #1a3a2a);
+  font-family: 'Jersey', sans-serif;
+  cursor: pointer;
+  user-select: none;
+}
+
+.headerRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.submissionLabel {
+  font-family: 'VT323', monospace;
+  font-size: 1.25rem;
+  color: var(--color-dark-green, #1a3a2a);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.userEmail {
+  font-family: 'VT323', monospace;
+  font-size: 0.875rem;
+  opacity: 0.5;
+}

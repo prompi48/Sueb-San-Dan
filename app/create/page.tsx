@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { PostForm } from '@/components/PostForm';
 import { Toast } from '@/components/Toast';
+import styles from './page.module.css';
 
 export default function CreatePage() {
   const router = useRouter();
@@ -45,21 +46,20 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="min-h-screen p-8 flex flex-col items-center bg-heritage-bg font-prompt">
-      <header className="w-full max-w-5xl flex justify-between items-center mb-10">
-        <h1 
-          className="text-4xl font-bold text-dark-green font-jersey cursor-pointer select-none" 
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <h1
+          className={styles.logo}
           onClick={() => router.push('/main')}
         >
           INHERITANCE
         </h1>
-        <div className="flex flex-col items-end">
-          <span className="font-vt323 text-xl text-dark-green uppercase tracking-widest">New Submission</span>
-          <span className="font-vt323 text-sm opacity-50">{user?.email}</span>
+        <div className={styles.headerRight}>
+          <span className={styles.submissionLabel}>New Submission</span>
+          <span className={styles.userEmail}>{user?.email}</span>
         </div>
       </header>
 
-      {/* เพิ่มความมั่นใจว่ามี User ก่อนโชว์ Form */}
       {user && <PostForm onSubmit={handleCreate} submitText="SUBMIT TO ARCHIVE" />}
 
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
