@@ -1,0 +1,91 @@
+.pageWrapper {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--heritage-bg);
+  font-family: var(--font-prompt);
+}
+
+.loadingScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--heritage-bg);
+  font-family: var(--font-jersey);
+  font-size: 1.875rem;
+  letter-spacing: -0.05em;
+  color: var(--dark-green);
+}
+
+/* ─── Header ─────────────────────────────────────── */
+
+.header {
+  width: 100%;
+  max-width: 56rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 1rem;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+}
+
+.siteTitle {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--dark-green);
+  font-family: var(--font-jersey);
+  cursor: pointer;
+}
+
+.siteSubtitle {
+  font-size: 0.625rem;
+  font-weight: 700;
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.headerRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.editBadge {
+  font-family: var(--font-vt323);
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  color: #d44c24;
+  background-color: white;
+  padding: 0 0.75rem;
+  border: 2px solid black;
+  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+}
+
+/* ─── Cancel Button ───────────────────────────────── */
+
+.cancelButton {
+  margin-top: 2rem;
+  font-size: 0.875rem;
+  font-family: var(--font-vt323);
+  opacity: 0.5;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.cancelButton:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
