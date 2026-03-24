@@ -3,38 +3,35 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Icon } from '@iconify/react';
-
-import { validateUsername, validatePassword } from '@/lib/validation';
-
+import { Icon } from '@iconify/react'
+import { validateUsername, validatePassword } from '@/lib/validation'
+import styles from './register.module.css'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false) // เพิ่มสถานะโหลด
-  const [showPassword, setShowPassword] = useState(false) // เพิ่ม State สำหรับ show/hide password
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false) // เพิ่ม State สำหรับ show/hide confirm password
+  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const router = useRouter()
 
-const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
 
     // --- [1. VALIDATION พื้นฐาน] ---
-    const usernameValidation = validateUsername(username);
-    if (usernameValidation) return alert(usernameValidation);
+    const usernameValidation = validateUsername(username)
+    if (usernameValidation) return alert(usernameValidation)
 
-
-const passValidationError = validatePassword(password, confirmPassword);
-if (passValidationError) return alert(passValidationError);
+    const passValidationError = validatePassword(password, confirmPassword)
+    if (passValidationError) return alert(passValidationError)
 
     setIsLoading(true)
 
     try {
       // --- [2. ตรวจสอบ USERNAME ซ้ำในตาราง PROFILES] ---
-      // เราเช็คก่อนเลยว่ามีใครใช้ชื่อนี้หรือยัง เพื่อไม่ให้เกิดขยะในระบบ Auth
-      const { data: existingUser, error: checkError } = await supabase
+      const { data: existingUser } = await supabase
         .from('profiles')
         .select('username')
         .eq('username', username)
@@ -42,7 +39,7 @@ if (passValidationError) return alert(passValidationError);
 
       if (existingUser) {
         setIsLoading(false)
-        return alert("This username is already taken. Please choose another one.")
+        return alert('This username is already taken. Please choose another one.')
       }
 
       // --- [3. สมัครสมาชิกในระบบ AUTH] ---
@@ -60,110 +57,108 @@ if (passValidationError) return alert(passValidationError);
       if (authData.user) {
         const { error: profileError } = await supabase
           .from('profiles')
-          .update({ username: username }) // ✅ update instead of insert
+          .update({ username })
           .eq('id', authData.user.id)
 
         if (profileError) {
           setIsLoading(false)
-          return alert(`Account created but profile failed: ${profileError.message}`);
+          return alert(`Account created but profile failed: ${profileError.message}`)
         }
 
-        alert("Registration Successful! Welcome to Inheritance.")
+        alert('Registration Successful! Welcome to Inheritance.')
         router.push('/main')
       }
     } catch (err) {
       console.error(err)
-      alert("An unexpected error occurred.")
+      alert('An unexpected error occurred.')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <main className="min-h-screen w-full bg-heritage-bg flex items-center justify-center p-4 md:p-[100px]">
-      <div className="w-full h-full max-w-[1720px] max-h-[880px] bg-heritage-bg border-[10px] border-heritage-frame rounded-[50px] shadow-lg flex flex-col items-center justify-center p-10">
-        
-        <h1 className="font-jersey text-[70px] md:text-[80px] text-dark-green drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)] mb-10 tracking-wider text-center">
-          INHERITANCE
-        </h1>
+    <main className={styles.page}>
+      <div className={styles.card}>
 
-        <form onSubmit={handleRegister} className="w-full max-w-[500px] flex flex-col gap-5">
-          <input 
+        <h1 className={styles.title}>INHERITANCE</h1>
+
+        <form onSubmit={handleRegister} className={styles.form}>
+
+          <input
             required
-            type="email" 
-            placeholder="E-MAIL" 
+            type="email"
+            placeholder="E-MAIL"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full h-[65px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center"
+            className={styles.input}
           />
-          <input 
+
+          <input
             required
-            type="text" 
-            placeholder="USERNAME" 
+            type="text"
+            placeholder="USERNAME"
             value={username}
             onChange={(e) => setUsername(e.target.value.toLowerCase())}
-            className="w-full h-[65px] bg-heritage-input rounded-full px-8 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center"
+            className={styles.input}
           />
 
           {/* PASSWORD พร้อมปุ่ม show/hide */}
-          <div className="relative w-full">
-            <input 
+          <div className={styles.inputWrapper}>
+            <input
               required
-              type={showPassword ? 'text' : 'password'} 
-              placeholder="PASSWORD" 
+              type={showPassword ? 'text' : 'password'}
+              placeholder="PASSWORD"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-[65px] bg-heritage-input rounded-full px-8 pr-14 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center [&::-ms-reveal]:hidden [&::-webkit-credentials-auto-fill-button]:hidden"
+              className={`${styles.input} ${styles.inputWithIcon}`}
             />
-            
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-dark-green transition-colors"
+              className={styles.eyeButton}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               <Icon icon={showPassword ? 'pixelarticons:eye-closed' : 'pixelarticons:eye'} width="24" />
             </button>
-
           </div>
 
           {/* CONFIRM PASSWORD พร้อมปุ่ม show/hide */}
-          <div className="relative w-full">
-            <input 
+          <div className={styles.inputWrapper}>
+            <input
               required
               type={showConfirmPassword ? 'text' : 'password'}
-              placeholder="CONFIRM PASSWORD" 
+              placeholder="CONFIRM PASSWORD"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full h-[65px] bg-heritage-input rounded-full px-8 pr-14 text-lg text-gray-500 placeholder:text-gray-400 placeholder:font-medium focus:outline-none focus:ring-4 focus:ring-heritage-frame/30 shadow-inner transition-all text-center [&::-ms-reveal]:hidden [&::-webkit-credentials-auto-fill-button]:hidden"
+              className={`${styles.input} ${styles.inputWithIcon}`}
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-dark-green transition-colors"
+              className={styles.eyeButton}
               aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
             >
               <Icon icon={showConfirmPassword ? 'pixelarticons:eye-closed' : 'pixelarticons:eye'} width="24" />
             </button>
           </div>
 
-          <div className="flex justify-center mt-4">
-            <button 
+          <div className={styles.submitWrapper}>
+            <button
               disabled={isLoading}
-              type="submit" 
-              className="w-[200px] h-[60px] bg-dark-green rounded-full text-2xl font-bold text-[#E1F5FE] hover:brightness-90 transition-all shadow-[0_4px_0_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none disabled:opacity-50"
+              type="submit"
+              className={styles.submitButton}
             >
               {isLoading ? '...' : 'REGISTER'}
             </button>
           </div>
+
         </form>
 
-        <div className="mt-8">
-          <Link href="/" className="text-dark-green font-bold hover:underline">
-            ← Back to Login
-          </Link>
+        <div className={styles.backLink}>
+          <Link href="/">← Back to Login</Link>
         </div>
+
       </div>
     </main>
-  );
+  )
 }
