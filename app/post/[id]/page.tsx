@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter, useParams } from 'next/navigation';
 import { Toast } from '@/components/Toast';
 import { Icon } from '@iconify/react';
+import styles from './page.module.css';
 
 export default function PostDetailPage() {
   const { id } = useParams();
@@ -14,7 +15,7 @@ export default function PostDetailPage() {
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
-  
+
   useEffect(() => {
     const fetchPostAndUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -26,7 +27,7 @@ export default function PostDetailPage() {
         .select('role')
         .eq('id', session.user.id)
         .single();
-      
+
       const adminStatus = profile?.role === 'admin';
       setIsAdmin(adminStatus);
 
@@ -56,8 +57,8 @@ export default function PostDetailPage() {
   }, [id, router]);
 
   const handleDelete = async () => {
-    const confirmMsg = isAdmin && user?.id !== post.author_id 
-      ? "SYSTEM WARNING: คุณกำลังใช้สิทธิ์ ADMIN เพื่อลบโพสต์นี้ ยืนยันหรือไม่?" 
+    const confirmMsg = isAdmin && user?.id !== post.author_id
+      ? "SYSTEM WARNING: คุณกำลังใช้สิทธิ์ ADMIN เพื่อลบโพสต์นี้ ยืนยันหรือไม่?"
       : "ยืนยันการลบโพสต์ของคุณออกจากระบบ?";
 
     if (!confirm(confirmMsg)) return;
@@ -76,7 +77,7 @@ export default function PostDetailPage() {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center font-jersey text-3xl text-dark-green bg-heritage-bg animate-pulse">
+    <div className={styles.loadingScreen}>
       RETRIEVING ARCHIVE
     </div>
   );
@@ -85,40 +86,40 @@ export default function PostDetailPage() {
   const canDelete = isOwner || isAdmin;
 
   return (
-    <div className="min-h-screen p-8 flex flex-col items-center bg-heritage-bg font-prompt">
-      <header className="w-full max-w-6xl flex justify-between items-center mb-10">
-        <h1 
-          className="text-4xl font-bold text-dark-green font-jersey cursor-pointer select-none" 
+    <div className={styles.pageWrapper}>
+      <header className={styles.header}>
+        <h1
+          className={styles.siteLogo}
           onClick={() => router.push('/main')}
         >
           INHERITANCE
         </h1>
       </header>
 
-      <div className="main-frame max-w-5xl w-full p-8 md:p-12 bg-[#D9D9D9] border-4 border-heritage-frame shadow-[16px_16px_0px_0px_rgba(0,0,0,0.1)] relative min-h-[500px] flex flex-col overflow-hidden">
-        
+      <div className={styles.mainFrame}>
+
         {/* Title & Control Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
-          <div className="flex-1 min-w-0">
-            <h2 className="text-4xl md:text-6xl font-bold font-jersey text-dark-green mb-2 uppercase break-all leading-tight">
+        <div className={styles.titleBar}>
+          <div className={styles.titleGroup}>
+            <h2 className={styles.postTitle}>
               {post.title}
             </h2>
-            <p className="text-xl font-prompt text-gray-600 font-bold break-all">{post.subject_name || '-'}</p>
+            <p className={styles.postSubject}>{post.subject_name || '-'}</p>
           </div>
 
-          <div className="flex gap-3 font-jersey text-xl self-end md:self-start shrink-0">
+          <div className={styles.actionButtons}>
             {isOwner && (
-              <button 
+              <button
                 onClick={() => router.push(`/edit/${id}`)}
-                className="px-6 py-2 bg-[#6CAFA5] text-white border-2 border-black hover:brightness-110 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-1 transition-all"
+                className={styles.btnEdit}
               >
                 EDIT
               </button>
             )}
             {canDelete && (
-              <button 
+              <button
                 onClick={handleDelete}
-                className="px-6 py-2 bg-[#d44c24] text-white border-2 border-black hover:brightness-110 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-y-1 transition-all flex items-center gap-2"
+                className={styles.btnDelete}
               >
                 <Icon icon="pixelarticons:trash" width="20" />
                 {isAdmin && !isOwner ? "MOD DELETE" : "DELETE"}
@@ -128,49 +129,49 @@ export default function PostDetailPage() {
         </div>
 
         {/* Info Header */}
-        <div className="flex flex-wrap gap-6 mb-8 font-vt323 text-2xl text-black/60 border-y-2 border-black/5 py-4">
-          <div className="flex items-center gap-2">
+        <div className={styles.infoHeader}>
+          <div className={styles.infoItem}>
             <Icon icon="la:book-solid" />
-            <span>{post.subject_id|| '-'}</span>
+            <span>{post.subject_id || '-'}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className={styles.infoItem}>
             <Icon icon="pixelarticons:user" />
             <span>{post.profiles?.username || "Deleted User"}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className={styles.infoItem}>
             <Icon icon="pixelarticons:calendar" />
             <span>{new Date(post.created_at).toLocaleDateString()}</span>
           </div>
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 font-prompt text-lg leading-relaxed text-black break-all mb-12 bg-white/30 p-6 border-2 border-dashed border-black/10 rounded-sm">
+        <div className={styles.contentBody}>
           {post.description}
         </div>
 
-        {/* Footer/Link Section */}
-        <div className="mt-auto">
+        {/* Footer / Link Section */}
+        <div className={styles.footer}>
           {post.media_link ? (
-            <a 
-              href={post.media_link.startsWith('http') ? post.media_link : `https://${post.media_link}`} 
-              target="_blank" 
+            <a
+              href={post.media_link.startsWith('http') ? post.media_link : `https://${post.media_link}`}
+              target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex justify-center items-center gap-3 p-4 bg-white border-2 border-black font-jersey text-2xl text-dark-green hover:bg-dark-green hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1"
+              className={styles.materialLink}
             >
               <Icon icon="pixelarticons:external-link" width="28" />
               ACCESS MATERIAL
             </a>
           ) : (
-            <div className="text-center p-4 border-2 border-dashed border-black/20 font-vt323 text-xl text-gray-400">
+            <div className={styles.noLink}>
               [ NO EXTERNAL LINKS ATTACHED ]
             </div>
           )}
         </div>
       </div>
 
-      <button 
-        onClick={() => router.push('/main')} 
-        className="mt-12 font-vt323 text-gray-400 hover:text-dark-green transition-colors text-2xl flex items-center gap-2"
+      <button
+        onClick={() => router.push('/main')}
+        className={styles.backButton}
       >
         <Icon icon="pixelarticons:arrow-left" />
         RETURN TO ARCHIVE LIST
