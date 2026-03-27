@@ -1,0 +1,29 @@
+.snackbar {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 20px 30px;
+  border: 4px solid black;
+  box-shadow: 10px 10px 0px rgba(0,0,0,0.3);
+  color: white;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.accept {
+  background: #4a8a7f;
+}
+
+.delete {
+  background: #a33a1d;
+}
+
+.button {
+  background: white;
+  color: black;
+  border: 2px solid black;
+  padding: 6px 16px;
+  box-shadow: 4px 4px 0px black;
+}
