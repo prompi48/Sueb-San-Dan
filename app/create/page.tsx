@@ -11,6 +11,7 @@ export default function CreatePage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const getSession = async () => {
@@ -25,7 +26,9 @@ export default function CreatePage() {
   }, [router]);
 
   const handleCreate = async (formData: any) => {
-    if (!user) return;
+    if (!user || isSubmitting) return;
+
+    setIsSubmitting(true);
 
     const { error } = await supabase
       .from('posts')
@@ -39,6 +42,7 @@ export default function CreatePage() {
 
     if (error) {
       setToast({ msg: "เกิดข้อผิดพลาดในการสร้างโพสต์: " + error.message, type: 'error' });
+      setIsSubmitting(false);
     } else {
       setToast({ msg: "ส่งโพสต์สำเร็จ! กำลังรอการตรวจสอบจากทีม Admin", type: 'success' });
       setTimeout(() => router.push('/main'), 2000);
@@ -60,8 +64,13 @@ export default function CreatePage() {
         </div>
       </header>
 
-      {user && <PostForm onSubmit={handleCreate} submitText="SUBMIT TO ARCHIVE" />}
-
+{user && (
+      <PostForm 
+        onSubmit={handleCreate} 
+        submitText={isSubmitting ? "UPLOADING..." : "SUBMIT TO ARCHIVE"} 
+        disabled={isSubmitting}
+      />
+    )}
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
