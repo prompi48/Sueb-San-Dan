@@ -13,9 +13,10 @@ interface PostFormProps {
   };
   onSubmit: (data: any) => void;
   submitText: string;
+  disabled?: boolean;
 }
 
-export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
+export function PostForm({ initialData, onSubmit, submitText, disabled }: PostFormProps) {
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     subject_name: initialData?.subject_name || '',
@@ -107,9 +108,16 @@ export function PostForm({ initialData, onSubmit, submitText }: PostFormProps) {
           
           <button 
             type="submit" 
+            disabled={disabled}
             className="w-full md:w-auto bg-[#F7ED92] py-4 px-10 text-2xl font-jersey border-2 border-black 
-                       shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] 
-                       active:translate-y-0 active:shadow-none transition-all whitespace-nowrap"
+                       shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all whitespace-nowrap
+                       
+                       /* คลาส disabled: เพื่อให้ปุ่มดูหงอยเมื่อกดไปแล้ว */
+                       disabled:bg-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0
+                       
+                       /* คลาส hover: เฉพาะตอนที่ปุ่มไม่โดน disabled */
+                       enabled:hover:-translate-y-1 enabled:hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] 
+                       enabled:active:translate-y-0 enabled:active:shadow-none"
           >
             {submitText}
           </button>
