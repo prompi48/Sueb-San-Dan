@@ -1,3 +1,18 @@
+/*
+app/register/page.tsx
+หน้า Register สำหรับสมัครสมาชิกใหม่
+
+ใช้ supabase.auth.signUp สมัครสมาชิกในระบบ Auth ของ Supabase และบันทึก username ลงตาราง Profiles
+มีปุ่ม show/hide password
+
+ก่อนจะยิง API ไปที่ Serverโค้ดมีการเรียกใช้ฟังก์ชันที่เขียนไว้ใน lib/validation.ts ตรวจชื่อและรหัสผ่าน
+มีการ Query ตาราง profiles ก่อนเพื่อดูว่ามีชื่อนี้หรือยัง
+ล็อคปุ่ม Register ขณะที่กำลังรอผลจาก Server เพื่อป้องกันการกดซ้ำ ด้วย isLoading
+
+ถ้าสมัครใน Auth สำเร็จ แต่การบันทึกลงตาราง Profiles ล้มเหลว
+ผู้ใช้ต้องติดต่อ Admin เพื่อรัน sql ลบ user ที่เพิ่งสร้างในตาราง auth.users ออก แล้วสมัครใหม่อีกครั้ง เพราะระบบเราแยกการจัดการข้อมูลผู้ใช้ระหว่าง Auth กับ Profiles
+
+*/
 'use client'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'

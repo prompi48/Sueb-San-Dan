@@ -1,3 +1,11 @@
+/* 
+app/create/page.tsx
+หน้าสร้างโพสต์ใหม่
+
+ส่ง is_pending: true ไปด้วยตั้งแต่ตอนสร้าง เพื่อให้โพสต์ใหม่ทุกโพสต์ต้องรอการอนุมัติจาก Admin ก่อนถึงจะแสดงในหน้า Main ได้
+แต่ไม่น่าเชื่อถือ จึงใช้ RLS โดยตั้งให้ insert policy รับเฉพาะ post ที่ is_pending: true ซ้ำอีกชั้นเพื่อความปลอดภัย
+*/
+
 'use client';
 
 import React, { useState, useEffect } from 'react';

@@ -1,3 +1,15 @@
+/*
+app/page.tsx
+หน้า Login หลักของแอป
+
+useState เก็บข้อมูลจากฟอร์ม
+useEffect เช็ค supabase.auth.getSession() เช็ค Session ตอนโหลดหน้า ถ้า User เคยล็อกอินค้างไว้แล้ว (มี Session) ระบบจะ Redirect ไปหน้า Main ถ้าไม่มีถึงจะแสดงหน้า Login
+isChecking ใช้เพื่อแสดงหน้าว่างหรือ Loading จนกว่าจะเช็ค Session เสร็จ เพื่อป้องกันการเห็นหน้า Login ชั่วคราวในกรณีที่มี Session อยู่แล้ว
+มีปุ่ม show/hide password
+ล็อคปุ่ม Login ขณะที่กำลังรอผลจาก Server เพื่อป้องกันการกดซ้ำ ด้วย isLoading
+supabase.auth.signInWithPassword: ฟังก์ชันส่ง Email และ Password ไปให้ Supabase เพื่อทำ Hashing Verification และเช็คกับฐานข้อมูล ถ้าถูกต้องจะได้ Session กลับมา ถ้าไม่ถูกต้องจะได้ Error กลับมา
+*/
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -18,13 +30,7 @@ export default function LoginPage() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // เช็ค Role จาก JWT แปะไปด้วยเลย เผื่อใช้แยกหน้า
-        const role = session.user.app_metadata?.role;
-        if (role === 'admin') {
-          router.push('/admin');
-        } else {
           router.push('/main');
-        }
       } else {
         setIsChecking(false); // เช็คเสร็จแล้วแต่ไม่มี session ถึงยอมให้เห็นหน้า login
       }
@@ -45,17 +51,11 @@ export default function LoginPage() {
       alert("Invalid Email or Password");
       setIsLoading(false);
     } else {
-      // ดึง role จาก data ที่ได้หลัง login สำเร็จทันที
-      const role = data.user?.app_metadata?.role;
-      if (role === 'admin') {
-        router.push('/admin/dashboard');
-      } else {
-        router.push('/main');
-      }
+      router.push('/main');
     }
   };
 
-  // ถ้ากำลังเช็ค Session อยู่ ให้โชว์หน้าว่างหรือ Loading สวยๆ แทนหน้า Login
+  // ถ้ากำลังเช็ค Session อยู่ ให้โชว์หน้าว่างหรือ Loading แทนหน้า Login
   if (isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-heritage-bg font-jersey text-4xl animate-pulse">

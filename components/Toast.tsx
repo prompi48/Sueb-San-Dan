@@ -1,3 +1,8 @@
+/*
+components/Toast.tsx
+เมื่อ Component นี้ปรากฏขึ้น (Mount) ระบบจะเริ่มนับถอยหลัง 5 วินาที (5000ms) แล้วสั่ง onClose เพื่อทำลายตัวเอง
+return () => clearTimeout(timer); หาก User ปิด Toast ไปก่อนหรือย้ายหน้าเว็บกระทันหัน เราต้อง "เคลียร์ไทม์เมอร์" ทิ้ง เพื่อไม่ให้มันค้างอยู่ในหน่วยความจำ
+*/
 import React, { useEffect } from 'react';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 

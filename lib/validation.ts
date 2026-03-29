@@ -1,4 +1,8 @@
-// lib/validation.ts
+/* 
+lib/validation.ts
+เก็บ reserved words และ regex สำหรับกฏการตั้งชื่อ
+เก็บ function ตรวจชื่อ และ fn ตรวจรหัส
+*/
 export const RESERVED_WORDS = ['admin', 'system', 'root', 'moderator', 'support', 'inheritance', 'null', 'undefined', 'void', 'select', 'insert', 'delete', 'update', 'drop', 'alter', 'create', 'table', 'database'];
 
 export const USERNAME_REGEX = /^[a-z0-9_]{3,16}$/;

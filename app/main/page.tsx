@@ -1,8 +1,12 @@
-// app/main/page.tsx
+/*
+app/main/page.tsx
+หน้า Main หลักของแอป
+ใช้ Suspense เพื่อรอโหลดข้อมูลจาก MainContent ถ้าข้อมูลยังไม่มา จะโชว์หน้าจอ Loading
+*/
 'use client';
 
 import { Suspense } from 'react';
-import MainContent from './MainContent'; // Import จากไฟล์ที่เราแยกออกไป
+import MainContent from './MainContent';
 import { Icon } from '@iconify/react';
 
 export default function MainPage() {

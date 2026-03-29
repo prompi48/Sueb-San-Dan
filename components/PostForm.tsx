@@ -1,7 +1,18 @@
+/*
+components/PostForm.tsx
+ใช้ 2 ที่ คือ หน้า Create กับ Edit 
+
+ใช้ useState เก็บข้อมูล ถ้าโดนแก้จะได้ rerender
+มีการรับ initialData กรณี edit โพสต์เดิม ถ้า create ก็จะเป็นค่าเริ่มต้นว่างๆ (|null)
+
+ก่อนส่งข้อมูล เราทำการ trim() และ แปลงค่าว่างเป็น null
+ปุ่ม submit จะถูก disabled หลังจากกด เพื่อป้องกันการส่งข้อมูลซ้ำ
+
+*/
 'use client';
 
 import React, { useState } from 'react';
-import { Icon } from '@iconify/react'; // เปลี่ยนมาใช้ Iconify ให้เหมือนหน้าอื่น
+import { Icon } from '@iconify/react';
 
 interface PostFormProps {
   initialData?: {
